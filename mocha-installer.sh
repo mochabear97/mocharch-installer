@@ -80,7 +80,8 @@ disk_check () {
     if [[ "$response" =~ ^(Y|y)$ ]]; then
         print "Wiping $DISK..."
         sfdisk --delete "$DISK"
-        sleep 3.0s
+        sgdisk -Zo "$DISK"
+        sleep 5.0s
     else
         print "Quitting..."
         sleep 3.0s
