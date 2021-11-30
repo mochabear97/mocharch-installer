@@ -90,9 +90,9 @@ disk_confirm () {
                sgdisk -Zo "$DISK"
                sleep 3.0s
                ;;
-        [Nn] ) print "Please select a disk again..."
+        [Nn] ) print "Exiting script..."
                sleep 3.0s
-               disk_selector
+               exit
     esac
 }
 
@@ -116,7 +116,7 @@ format_partitions () {
     clear
     print "Formatting partitions now..."
 
-    mkfs.ext4 "$DISK"p3
+    mkfs.ext4 -F "$DISK"p3
     mkswap "$DISK"p2
     mkfs.fat -F 32 "$DISK"p1
     mount "$DISK"p3 /mnt
@@ -295,6 +295,7 @@ root_set() {
     clear
     print "Please create a password for the root user."
     arch-chroot /mnt passwd root
+    sleep 3.0s
 }
 
 # User creation.
@@ -305,13 +306,14 @@ create_user () {
     arch-chroot /mnt useradd -m "$username"
     print "\nPlease enter a password for the new user."
     arch-chroot /mnt passwd "$username"
+    sleep 3.0s
     clear
     echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges.\e[0m"
     arch-chroot /mnt gpasswd -a "$username" adm
     arch-chroot /mnt gpasswd -a "$username" rfkill
     arch-chroot /mnt gpasswd -a "$username" wheel
     echo "$username  ALL=(ALL) ALL" >> /mnt/etc/sudoers.d/"$username"
-    sleep 5.0s
+    sleep 3.0s
   fi
 }
 
