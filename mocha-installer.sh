@@ -111,15 +111,15 @@ ROOT="Root partition"
 format_partitions () {
     clear
     print "Formatting partitions now..."
-    sleep 5.0s
 
-    mkfs.ext4 -q "$DISK"p3
     mkswap "$DISK"p2
     mkfs.fat -F 32 "$DISK"p1
     mount "$DISK"p3 /mnt
     mkdir /mnt/efi
     mount "$DISK"p1 /mnt/efi
     swapon "$DISK"p2
+
+    sleep 5.0s
 }
 
 # Detect microcode (AMD/INTEL).
