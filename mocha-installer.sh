@@ -91,14 +91,19 @@ disk_check () {
 
 # Creating a new partition scheme.
 create_partitions () {
+    clear
     print "Creating the partitions on $DISK..."
     parted -s "$DISK" \
         mklabel gpt \
-        mkpart "EFI system partition" fat32 1MiB 250MiB \
-        set 1 esp on \
-        mkpart "swap partition" linux-swap 250Mib 6.25GiB \
-        mkpart "root partition" ext4 6.25GiB 100% \
-        sleep 3.0s
+        mkpart ESP fat32 1MiB 250MiB \
+        set 1 ESP on \
+        mkpart SWAP linux-swap 250Mib 6.25GiB \
+        mkpart ROOT ext4 6.25GiB 100% \
+        sleep 5.0s
+        ESP="EFI system partition"
+        SWAP="SWAP partition"
+        ROOT="Root partition"
+
 }
 
 #format disk partitions
