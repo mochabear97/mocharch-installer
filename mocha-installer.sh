@@ -113,7 +113,7 @@ format_partitions () {
     print "Formatting partitions now..."
     sleep 5.0s
 
-    mkfs.ext4 "$DISK"p3
+    mkfs.ext4 -q "$DISK"p3
     mkswap "$DISK"p2
     mkfs.fat -F 32 "$DISK"p1
     mount "$DISK"p3 /mnt
@@ -245,11 +245,12 @@ create_user () {
   if [ -n "$username" ]; then
   echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges."
     arch-chroot /mnt useradd -m "$username"
-    arch-chroot /mnt usermod -aG adm
-    arch-chroot /mnt usermod -aG rfkill
-    arch-chroot /mnt usermod -aG wheel
-    echo "$username  ALL=(ALL) ALL" >> /mnt/etc/sudoers.d/"$username"
+    print "\nPlease enter a password for the new user."
     arch-chroot /mnt passwd "$username"
+    arch-chroot /mnt gpasswd -a "$username" adm
+    arch-chroot /mnt gpasswd -a "$username" rfkill
+    arch-chroot /mnt gpasswd -a "$username" wheel
+    echo "$username  ALL=(ALL) ALL" >> /mnt/etc/sudoers.d/"$username"
     sleep 3.0s
   fi
 }
