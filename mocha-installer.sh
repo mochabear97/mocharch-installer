@@ -101,7 +101,7 @@ create_partitions () {
         set 1 ESP on \
         mkpart SWAP linux-swap 250Mib 6.25GiB \
         mkpart ROOT ext4 6.25GiB 100% \
-        sleep 5.0s
+    sleep 5.0s
 ESP="EFI system partition"
 SWAP="SWAP partition"
 ROOT="Root partition"
