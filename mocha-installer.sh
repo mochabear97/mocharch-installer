@@ -324,6 +324,9 @@ arch-chroot /mnt /bin/bash -e << EOF
     print "Time to set root password."
 EOF
 
+clear
+
+print "Please create a password for the root user"
 arch-chroot /mnt passwd root
 
 arch-chroot /mnt create_user
