@@ -297,17 +297,17 @@ arch-chroot /mnt /bin/bash -e << EOF
     sleep 2.0s
     
     # Setting up clock.
-    echo "Setting up the system clock...\n"
+    echo "Setting up the system clock..."
     hwclock --systohc
     sleep 2.0s
     
     # Generating locales.
-    echo "Generating locales...\n"
+    echo "Generating locales..."
     locale-gen &>/dev/null
     sleep 2.0s
     
     # Generating a new initramfs.
-    echo "Creating a new initramfs...\n"
+    echo "Creating a new initramfs..."
     mkinitcpio -P &>/dev/null
     sleep 2.0s
     
@@ -322,10 +322,11 @@ arch-chroot /mnt /bin/bash -e << EOF
     sleep 2.0s
 
     print "Time to set root password."
-    passwd root
-
-    create_user
 EOF
+
+arch-chroot /mnt passwd root
+
+arch-chroot /mnt create_user
 
 # Print a message after installing then restart.
 clear
