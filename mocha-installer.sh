@@ -100,9 +100,9 @@ create_partitions () {
         mkpart SWAP linux-swap 250Mib 6.25GiB \
         mkpart ROOT ext4 6.25GiB 100% \
         sleep 5.0s
-        ESP="EFI system partition"
-        SWAP="SWAP partition"
-        ROOT="Root partition"
+ESP="EFI system partition"
+SWAP="SWAP partition"
+ROOT="Root partition"
 
 }
 
@@ -272,6 +272,7 @@ intitialization
 disk_selector
 disk_check
 create_partitions
+format_partitions
 microcode_detector
 kernel_selector
 network_selector
