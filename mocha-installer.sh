@@ -96,8 +96,8 @@ create_partitions () {
         mklabel gpt \
         mkpart "EFI system partition" fat32 1MiB 250MiB \
         set 1 esp on \
-        mkpart "SWAP partition" linux-swap 250Mib 6.25GiB \
-        mkpart "Root Partition" ext4 6.25GiB 100% \
+        mkpart "swap partition" linux-swap 250Mib 6.25GiB \
+        mkpart "root partition" ext4 6.25GiB 100% \
         sleep 3.0s
 }
 
