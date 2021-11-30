@@ -79,9 +79,8 @@ disk_check () {
     response=${response,,}
     if [[ "$response" =~ ^(Y|y)$ ]]; then
         print "Wiping $DISK..."
-        sfdisk --delete "$DISK"
-        sgdisk -Zo "$DISK"
-        sleep 5.0s
+        ( echo d; echo d; echo d; echo d; echo d; echo d; echo w ) | fdisk "$DISK"
+        sleep 3.0s
     else
         print "Quitting..."
         sleep 3.0s
@@ -91,12 +90,13 @@ disk_check () {
 
 # Creating a new partition scheme.
 create_partitions () {
-    print "Creating the partitions on $DISK."
+    print "Creating the partitions on $DISK..."
     # Create the new partitions.
     ( echo n; echo p; echo ""; echo ""; echo +250M; echo y; echo n; echo p; echo ""; echo ""; echo +6G; \
     echo y; echo n; echo p; echo ""; echo ""; echo""; echo w ) | fdisk "$DISK"
     # Tag the partitions with certain flags which tell Arch Linux what kind of partition it is.
     ( echo t; echo 1; echo 1; echo t; echo 2; echo 19; echo t; echo 3; echo 23; echo w ) | fdisk "$DISK" 
+    sleep 3.0s
 }
 
 #format disk partitions
