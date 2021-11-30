@@ -92,12 +92,13 @@ disk_check () {
 # Creating a new partition scheme.
 create_partitions () {
     print "Creating the partitions on $DISK..."
-    # Create the new partitions.
-    ( echo g echo n echo p echo  echo  echo +250M echo y echo n echo p echo  echo  echo +6G \
-    echo y echo n echo p echo  echo  echo  echo w ) | fdisk "$DISK"
-    # Tag the partitions with certain flags which tell Arch Linux what kind of partition it is.
-    ( echo t echo 1 echo 1 echo t echo 2 echo 19 echo t echo 3 echo 23 echo w ) | fdisk "$DISK" 
-    sleep 3.0s
+    parted -s "$DISK" \
+        mklabel gpt \
+        mkpart "EFI system partition" fat32 1MiB 250MiB \
+        set 1 esp on \
+        mkpart "SWAP partition" linux-swap 250Mib 6.25GiB \
+        mkpart "Root Partition" ext4 6.25GiB 100% \
+        sleep 3.0s
 }
 
 #format disk partitions
