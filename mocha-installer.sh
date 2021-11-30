@@ -79,7 +79,7 @@ disk_check () {
     response=${response,,}
     if [[ "$response" =~ ^(Y|y)$ ]]; then
         print "Wiping $DISK..."
-        ( echo d; echo d; echo d; echo d; echo d; echo d; echo w ) | fdisk "$DISK"
+        sfdisk --delete "$DISK"
         sleep 3.0s
     else
         print "Quitting..."
