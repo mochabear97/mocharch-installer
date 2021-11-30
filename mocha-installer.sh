@@ -120,9 +120,6 @@ format_partitions () {
     mkdir /mnt/efi
     mount "$DISK"p1 /mnt/efi
     swapon "$DISK"p2
-
-    print "\nFormatting complete."
-    sleep 3.0s
 }
 
 # Detect microcode (AMD/INTEL).
@@ -243,15 +240,16 @@ create_user () {
   clear
   read -r -p "Please Enter a name for a user account (leave empty and press enter to skip): "  username
   if [ -n "$username" ]; then
-  echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges."
     arch-chroot /mnt useradd -m "$username"
     print "\nPlease enter a password for the new user."
     arch-chroot /mnt passwd "$username"
+    clear
+    echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges."
     arch-chroot /mnt gpasswd -a "$username" adm
     arch-chroot /mnt gpasswd -a "$username" rfkill
     arch-chroot /mnt gpasswd -a "$username" wheel
     echo "$username  ALL=(ALL) ALL" >> /mnt/etc/sudoers.d/"$username"
-    sleep 3.0s
+    sleep 5.0s
   fi
 }
 
