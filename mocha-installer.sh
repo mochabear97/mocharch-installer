@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# A simple Arch Linux install script
+
 #################
 #   Functions   #
 #################
@@ -103,15 +105,13 @@ create_partitions () {
 ESP="EFI system partition"
 SWAP="SWAP partition"
 ROOT="Root partition"
-
 }
 
 #format disk partitions
 format_partitions () {
     clear
     print "Formatting partitions now..."
-    sleep 3.0s
-    clear
+    sleep 5.0s
 
     mkfs.ext4 "$DISK"p3
     mkswap "$DISK"p2
@@ -127,6 +127,7 @@ format_partitions () {
 
 # Detect microcode (AMD/INTEL).
 microcode_detector () {
+    clear
     CPU=$(grep vendor_id /proc/cpuinfo)
     if [[ $CPU == *"AuthenticAMD"* ]]; then
         print "An AMD CPU has been detected, the AMD microcode will be installed."
@@ -240,7 +241,7 @@ keyboard_selector () {
 # User creation.
 create_user () {
   clear
-  read -r -p "Please Enter a name for a user account (leave empty and press enter to skip):"  username
+  read -r -p "Please Enter a name for a user account (leave empty and press enter to skip): "  username
   if [ -n "$username" ]; then
   echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges."
     arch-chroot /mnt useradd -m "$username"
