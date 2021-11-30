@@ -78,17 +78,21 @@ disk_selector () {
 # Check disk is correct (function).
 disk_check () {
     read -r -p "This will delete the current partition table on $DISK. Do you agree? (y/n): " response
-    response=${response,,}
-    if [[ "$response" =~ ^(Y|y)$ ]]; then
-        print "Wiping $DISK..."
-        wipefs -af "$DISK"
-        sgdisk -Zo "$DISK"
-        sleep 3.0s
-    else
-        print "Quitting..."
-        sleep 3.0s
-        exit
-    fi
+    case $response in
+        [Yy] ) print "Wiping $DISK..."
+               wipefs -af "$DISK"
+               sgdisk -Zo "$DISK"
+               sleep 3.0s
+               ;;
+        [""] ) print "Wiping $DISK..."
+               wipefs -af "$DISK"
+               sgdisk -Zo "$DISK"
+               sleep 3.0s
+               ;;
+        [Nn] ) print "Please select a disk again..."
+               sleep 3.0s
+               disk_selector
+    esac
 }
 
 # Creating a new partition scheme.
@@ -97,14 +101,11 @@ create_partitions () {
     print "Creating the partitions on $DISK..."
     parted -s "$DISK" \
         mklabel gpt \
-        mkpart ESP fat32 1MiB 250MiB \
+        mkpart primary fat32 1MiB 251MiB \
         set 1 ESP on \
-        mkpart SWAP linux-swap 250Mib 6.25GiB \
-        mkpart ROOT ext4 6.25GiB 100% \
+        mkpart primary linux-swap 251Mib 6.26GiB \
+        mkpart primary ext4 6.26GiB 100% \
     sleep 5.0s
-ESP="EFI system partition"
-SWAP="SWAP partition"
-ROOT="Root partition"
 }
 
 #format disk partitions
@@ -112,6 +113,7 @@ format_partitions () {
     clear
     print "Formatting partitions now..."
 
+    mkfs.ext4 "$DISK"p3
     mkswap "$DISK"p2
     mkfs.fat -F 32 "$DISK"p1
     mount "$DISK"p3 /mnt
