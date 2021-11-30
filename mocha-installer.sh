@@ -78,9 +78,9 @@ disk_check () {
     read -r -p "This will delete the current partition table on $DISK. Do you agree? (y/n): " response
     response=${response,,}
     if [[ "$response" =~ ^(Y|y)$ ]]; then
-        print "Wiping $DISK."
-        wipefs -af "$DISK" &>/dev/null
-        sgdisk -Zo "$DISK" &>/dev/null
+        print "Wiping $DISK..."
+        sfdisk --delete "$DISK"
+        sleep 3.0s
     else
         print "Quitting..."
         sleep 3.0s
@@ -235,12 +235,12 @@ create_user () {
   read -r -p "Please Enter a name for a user account (leave empty and press enter to skip):"  username
   if [ -n "$username" ]; then
   echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges."
-    useradd -m "$username"
-    usermod -aG adm
-    usermod -aG rfkill
-    usermod -aG wheel
-    echo "$username  ALL=(ALL) ALL" >> /etc/sudoers.d/"$username"
-    passwd "$username"
+    arch-chroot /mnt useradd -m "$username"
+    arch-chroot /mnt usermod -aG adm
+    arch-chroot /mnt usermod -aG rfkill
+    arch-chroot /mnt usermod -aG wheel
+    echo "$username  ALL=(ALL) ALL" >> /mnt/etc/sudoers.d/"$username"
+    arch-chroot /mnt passwd "$username"
     sleep 3.0s
   fi
 }
@@ -274,7 +274,7 @@ clear
 echo -e "Installing base system now."
 sleep 3.0s
 
-pacstrap /mnt base $microcode $kernel linux-firmware grub efibootmgr base-devel man-db man-pages nnn neovim texinfo zsh
+pacstrap /mnt base $microcode $kernel linux-firmware grub efibootmgr base-devel man-db man-pages nnn neovim sudo texinfo zsh
 
 hostname_selector
 
@@ -320,16 +320,13 @@ arch-chroot /mnt /bin/bash -e << EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
     sleep 2.0s
-
-    print "Time to set root password."
 EOF
 
 clear
 
 print "Please create a password for the root user"
 arch-chroot /mnt passwd root
-
-arch-chroot /mnt create_user
+create_user
 
 # Print a message after installing then restart.
 clear
