@@ -93,9 +93,9 @@ create_partitions () {
     print "Creating the partitions on $DISK."
     # Create the new partitions.
     ( echo n; echo p; echo ""; echo ""; echo +250M; echo y; echo n; echo p; echo ""; echo ""; echo +6G; \
-    echo y; echo n; echo p; echo ""; echo ""; echo""; echo w; ) | fdisk "$DISK"
+    echo y; echo n; echo p; echo ""; echo ""; echo""; echo w ) | fdisk "$DISK"
     # Tag the partitions with certain flags which tell Arch Linux what kind of partition it is.
-    ( echo t; echo 1; echo 1; echo t; echo 2; echo 19; echo t; echo 3; echo 23; echo w; ) | fdisk "$DISK" 
+    ( echo t; echo 1; echo 1; echo t; echo 2; echo 19; echo t; echo 3; echo 23; echo w ) | fdisk "$DISK" 
 }
 
 #format disk partitions
