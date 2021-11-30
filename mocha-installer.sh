@@ -7,17 +7,17 @@
 #################
 
 
-# Blue text print (function).
+# Blue text print.
 print () {
     echo -e "\x1b[1;94m$1\e[0m"
 }
 
-# Yellow text print warnings (function).
+# Yellow text print warnings.
 print_w () {
     echo -e "\x1b[0;33m[w] $1\e[0m"
 }
 
-# Check if script is being ran as root and exit if it isn't
+# Check if script is being ran as root and exit if it isn't.
 root_check () {
     if [ "$EUID" -ne 0 ] 
         then 
@@ -27,7 +27,7 @@ root_check () {
     fi
 }
 
-# Welcome (function).
+# Welcome screen.
 welcome () {
     print "##############################"
     print "#                            #"
@@ -39,7 +39,7 @@ welcome () {
     print "##############################"
 }
 
-# Ask the user if they want to install this script (function).
+# Ask the user if they want to install this script.
 continue_check () {
     read -r -p "[?] Would you like to continue? (y/n): " choice
     case $choice in
@@ -56,6 +56,7 @@ continue_check () {
     esac
 }
 
+# Initialize the program after welcome.
 intitialization () {
    clear
    print "Initializing..."
@@ -63,7 +64,7 @@ intitialization () {
    sleep 3.0s
 }
 
-# Selecting a disk to install Arch Linux on (function).
+# Selecting a disk to install Arch Linux on.
 disk_selector () {
     clear
     print "Please select the disk where Arch Linux will be installed:"
@@ -76,7 +77,7 @@ disk_selector () {
 }
 
 # Check disk is correct (function).
-disk_check () {
+disk_confirm () {
     read -r -p "This will delete the current partition table on $DISK. Do you agree? (y/n): " response
     case $response in
         [Yy] ) print "Wiping $DISK..."
@@ -94,6 +95,8 @@ disk_check () {
                disk_selector
     esac
 }
+
+# Ask about memory size and set swap varriable accoringly.
 
 # Creating a new partition scheme.
 create_partitions () {
@@ -129,11 +132,11 @@ microcode_detector () {
     clear
     CPU=$(grep vendor_id /proc/cpuinfo)
     if [[ $CPU == *"AuthenticAMD"* ]]; then
-        print "An AMD CPU has been detected, the AMD microcode will be installed."
+        print "An AMD CPU has been detected, AMD microcode will be installed."
         sleep 3.0s
         microcode="amd-ucode"
     else
-        print "An Intel CPU has been detected, the Intel microcode will be installed."
+        print "An Intel CPU has been detected, Intel microcode will be installed."
         sleep 3.0s
         microcode="intel-ucode"
     fi
@@ -147,7 +150,7 @@ kernel_selector () {
     print "2) Hardened: A security-focused Linux kernel"
     print "3) LTS: Long-term support (LTS) Linux kernel"
     print "4) Zen: A Linux kernel optimized for desktop usage"
-    read -r -p "Insert the number of the corresponding kernel (1-4): " choice
+    read -r -p "Insert the number of the corresponding kernel. (1-4): " choice
     case $choice in
         1 ) kernel="linux"
             ;;
@@ -172,7 +175,7 @@ network_selector () {
     print "2) NetworkManager: Universal network utility to automatically connect to networks (both WiFi and Ethernet)"
     print "3) dhcpcd: Basic DHCP client (Ethernet only or VMs)"
     print "4) I will do this on my own (only advanced users)"
-    read -r -p "Insert the number of the corresponding networking utility: " choice
+    read -r -p "Insert the number of the corresponding networking utility. (1-4): " choice
     case $choice in
         1 ) print "Installing IWD."    
             pacstrap /mnt iwd
@@ -203,6 +206,16 @@ network_selector () {
     esac
 }
 
+# Basic install of Arch Linux.
+basic_install () {
+    clear
+    print "Installing base system now..."
+    sleep 3.0s
+
+    pacstrap /mnt base $microcode $kernel linux-firmware grub efibootmgr \
+    base-devel man-db man-pages nnn neovim sudo texinfo zsh
+}
+
 # Set a hostname for the new system.
 hostname_selector () {
     clear
@@ -212,6 +225,14 @@ hostname_selector () {
         hostname_selector
     fi
     echo "$hostname" > /mnt/etc/hostname
+}
+
+# Generate fstab.
+gen_stab () {
+    clear
+    print "Generating a new fstab..."
+    genfstab -U /mnt >> /mnt/etc/fstab
+    sleep 3.0s
 }
 
 # Select a language locale.
@@ -229,12 +250,51 @@ locale_selector () {
 # Select a keyboard layout to be installed.
 keyboard_selector () {
     clear
-    read -r -p "Please insert the keyboard layout you use (enter empty to use US keyboard layout): " kblayout
+    read -r -p "Please insert the keyboard layout you use (Press enter to use US keyboard layout): " kblayout
     if [ -z "$kblayout" ]; then
-        print_w "US keyboard layout will be used by default."
+        print_w "Default keyboard layout set to US."
         kblayout="us"
     fi
     echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
+}
+
+# configure new system.
+system_setup () {
+    clear
+    print "Beginning system configuration..."
+    sleep 3.0s
+    print "\nSetting timezone..."
+    arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$(curl -s http://ip-api.com/line?fields=timezone)" \
+    /etc/localtime &>/dev/null
+    sleep 1.0s
+
+    print "\nConfiguring system hardware clock..."
+    arch-chroot /mnt hwclock --systohc
+    sleep 1.0ss
+
+    print "\nGenerating locales..."
+    arch-chroot /mnt locale-gen &>/dev/null
+    sleep 1.0s
+
+    print "\nGenerating new initramfs..."
+    arch-chroot /mnt mkinitcpio -P &>/dev/null
+    sleep 1.0s
+
+    print "\nInstalling grub bootloader..."
+    arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/efi \
+    --bootloader-id=GRUB &>/dev/null
+    sleep 1.0s
+
+    print "\nCreating grub config file..."
+    arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
+    sleep 1.0s
+}
+
+# Set root password.
+root_set() {
+    clear
+    print "Please create a password for the root user."
+    arch-chroot /mnt passwd root
 }
 
 # User creation.
@@ -246,7 +306,7 @@ create_user () {
     print "\nPlease enter a password for the new user."
     arch-chroot /mnt passwd "$username"
     clear
-    echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges."
+    echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges.\e[0m"
     arch-chroot /mnt gpasswd -a "$username" adm
     arch-chroot /mnt gpasswd -a "$username" rfkill
     arch-chroot /mnt gpasswd -a "$username" wheel
@@ -256,89 +316,36 @@ create_user () {
 }
 
 
-#################
-#   Installer   #
-#################
+###############
+#   Program   #
+###############
 
 root_check
 
 # Start by clearing the terminal
 clear
 
-
+# Installation
 welcome
 continue_check
-
-# Installation functions
 intitialization
 disk_selector
-disk_check
+disk_confirm
 create_partitions
 format_partitions
 microcode_detector
 kernel_selector
 network_selector
-
-clear
-
-echo -e "Installing base system now."
-sleep 3.0s
-
-pacstrap /mnt base $microcode $kernel linux-firmware grub efibootmgr base-devel man-db man-pages nnn neovim sudo texinfo zsh
-
+basic_install
 hostname_selector
-
-clear
-
-print "Generating a new fstab."
-genfstab -U /mnt >> /mnt/etc/fstab
-sleep 3.0s
-
+gen_stab
 locale_selector
 keyboard_selector
-
-clear
-
-# Configuring the system.    
-arch-chroot /mnt /bin/bash -e << EOF
-    # Setting up timezone.
-    echo "Setting up the timezone..."
-    ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
-    sleep 2.0s
-    
-    # Setting up clock.
-    echo "Setting up the system clock..."
-    hwclock --systohc
-    sleep 2.0s
-    
-    # Generating locales.
-    echo "Generating locales..."
-    locale-gen &>/dev/null
-    sleep 2.0s
-    
-    # Generating a new initramfs.
-    echo "Creating a new initramfs..."
-    mkinitcpio -P &>/dev/null
-    sleep 2.0s
-    
-    # Installing GRUB.
-    echo "Installing GRUB on /efi."
-    grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB &>/dev/null
-    sleep 2.0s
-
-    # Creating grub config file.
-    echo "Creating GRUB config file."
-    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
-    sleep 2.0s
-EOF
-
-clear
-
-print "Please create a password for the root user"
-arch-chroot /mnt passwd root
+system_setup
+root_set
 create_user
 
-# Print a message after installing then restart.
+# Print a message after installing then restarts the system.
 clear
 print "Installation of Arch Linux is now complete!"
 print "Computer will now restart in 30.0s..."
