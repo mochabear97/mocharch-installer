@@ -103,20 +103,24 @@ paru_install () {
                print "Installing paru now..."
                print_i "Some credentials may be required for $username"
                sleep 5.0s
+               pacman -S cargo
                sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
-               cd /home/"$username"/paru || return
-               sudo -u "$username" makepkg -si
-               cd || return
+               sudo -u "$username" cd /home/"$username"/paru || return
+               sudo -u "$username" makepkg -i
+               sudo -u "$username" rm -rm /home/"$username"/paru
+               sudo -u "$username" cd || return
                sleep 3.0s
                ;;
         "" ) clear
              print "Installing paru now..."
              print_i "Some credentials may be required for $username"
              sleep 5.0s
+             pacman -S cargo
              sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
-             cd /home/"$username"/paru || return
-             sudo -u "$username" makepkg -si
-             cd || return
+             sudo -u "$username" cd /home/"$username"/paru || return
+             sudo -u "$username" makepkg -i
+             sudo -u "$username" rm -rm /home/"$username"/paru
+             sudo -u "$username" cd || return
              sleep 3.0s
     esac
 }
