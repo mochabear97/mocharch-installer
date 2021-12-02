@@ -239,7 +239,7 @@ basic_install () {
     print "Installing base system now..."
     sleep 3.0s
 
-    pacstrap /mnt base $microcode $kernel linux-firmware git grub efibootmgr \
+    pacstrap /mnt base cargo $microcode $kernel linux-firmware git grub efibootmgr \
     base-devel man-db man-pages os-prober sudo texinfo
 }
 
