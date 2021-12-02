@@ -237,19 +237,23 @@ de_select () {
 de_selection_check () {
   read -r -p "[?] Is this correct? (y/n): " choice
   case $choice in
-    y ) sleep 2.0s4
+    "" ) sleep 2.0s
+         de_wm_package_selector
         ;;
-    n ) print_i "Please try again."
-	    sleep 2.0s
-	    clear
-        de_select
-	    ;;
-    * ) de_selection_check
+    [Yy] ) sleep 2.0s
+           de_wm_package_selector
+	       ;;
+    [Nn] ) sleep 2.0s
+           de_select
+	       ;;
+    * ) print_w "Please try again."
+        de_selection_check
   esac
 }
 
 # Window manager selection
 wm_select () {
+  clear
   print "**Window Manager Menu**"
   print "\n1) Awesome"
   print "2) BSPWM"
@@ -354,14 +358,18 @@ wm_select () {
 wm_selection_check () {
   read -r -p "[?] Is this correct? (y/n): " choice
   case $choice in
-    y ) sleep 2.0s
-        ;;
-    n ) print_i "Please try again."
-	    sleep 2.0s
-	    clear
-        wm_select
-	    ;;
-    * ) wm_selection_check
+    "" ) sleep 2.0s
+         de_wm_package_selector
+         ;;
+    [Yy] ) sleep 2.0s
+           de_wm_package_selector
+           ;;
+    [Nn] ) sleep 2.0s
+	       clear
+           wm_select
+	       ;;
+    * ) print_w "Please try again."
+        wm_selection_check
   esac
 }
 
