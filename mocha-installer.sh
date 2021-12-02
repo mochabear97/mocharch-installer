@@ -318,8 +318,8 @@ gpu_driver_check () {
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
         sed -i "/\[multilib\]/,/Include/"'s/^#//g' /mnt/etc/pacman.conf
-        pacman -Syy
-        pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
+        arch-chroot /mnt pacman -Syy
+        arch-chroot /mnt pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
@@ -330,7 +330,7 @@ gpu_driver_check () {
         sleep 3.0s
         sed -i "/\[multilib\]/,/Include/"'s/^#//g' /mnt/etc/pacman.conf
         arch-chroot /mnt pacman -Syy
-        arch-chroot /mnt pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
+        arch-chroot /mnt pacman -S --noconfirm nvidia-lts lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
@@ -341,7 +341,7 @@ gpu_driver_check () {
         sleep 3.0s
         sed -i "/\[multilib\]/,/Include/"'s/^#//g' /mnt/etc/pacman.conf
         arch-chroot /mnt pacman -Syy
-        arch-chroot /mnt pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
+        arch-chroot /mnt pacman -S --noconfirm nvidia-dkms lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
