@@ -317,7 +317,8 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+        arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
+        arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         pacman -Syy
         pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
@@ -328,7 +329,8 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+         arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
+        arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         arch-chroot /mnt pacman -Syy
         arch-chroot /mnt pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
@@ -339,7 +341,8 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+        arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
+        arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         arch-chroot /mnt pacman -Syy
         arch-chroot /mnt pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
@@ -350,7 +353,8 @@ gpu_driver_check () {
         clear
         print "AMD graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+         arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
+        arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         arch-chroot /mnt pacman -Syy
         arch-chroot /mnt pacman -S --noconfirm mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon mesa-vdpau lib32-mesa-vdpau
         sleep 2.0s
