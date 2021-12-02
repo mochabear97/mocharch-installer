@@ -39,7 +39,7 @@ root_check () {
         then 
         print_w "Please run this script as root."
         print_y "\nIf you would like to delete this script,"
-        print_y "please login as root and hit n when asked to continue."
+        print_y "please login as root and hit (n/N) when asked to continue."
         sleep 10.0s
         exit
     fi
@@ -55,7 +55,7 @@ welcome () {
     print "#   Version: 1.0.0           #"
     print "#                            #"
     print "##############################"
-    print "$username"
+    print "\nWelcome $username"
     echo -e "\n"
     print_i "This script allows you to install paru, some packages,"
     print_b "and select a desktop environment or window manager to install."
@@ -73,7 +73,7 @@ continue_check () {
                ;;
         [Nn] ) print_i "Removing script and exiting..."
                sleep 3.0s
-               rm -rf /etc/profile/gui-installer.sh
+               rm -rf /etc/profile.d/gui-installer.sh
                exit
                ;;
            * ) print_w "You did not enter a valid selection."
@@ -87,9 +87,11 @@ paru_install () {
         then
         clear
         print "Would you like to install paru for AUR support?"
-        print_i "\nThe Arch User Repositories feature thousands"
+        echo -e "\n"
+        print_i "The Arch User Repositories feature thousands"
         print_b "of packages not features in the main repos."
-        print_w "\nMany packages the script that runs after reboot"
+        echo -e "\n"
+        print_w "Many packages the script that runs after reboot"
         print_y "require AUR support. They will be labeled (AUR)."
         read -r -p "Answer (y/n): " choice
         case $choice in
@@ -98,21 +100,23 @@ paru_install () {
                    ;;
             [Yy] ) clear
                    print "Installing paru now..."
-                   sleep 2.0s
-                   git clone https://aur.archlinux.org/paru.git /paru
-                   cd /paru || return
-                   #sudo -u "$username" makepkg -si
+                   print_i "Some credentials may be required for $username"
+                   sleep 5.0s
+                   sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
+                   cd /home/"$username"/paru || return
+                   sudo -u "$username" makepkg -si
                    cd || return
                    sleep 3.0s
                    ;;
             "" ) clear
-                   print "Installing paru now..."
-                   sleep 2.0s
-                   git clone https://aur.archlinux.org/paru.git /paru
-                   cd /paru || return
-                   #sudo -u "$username" makepkg -si
-                   cd || return
-                   sleep 3.0s
+                 print "Installing paru now..."
+                 print_i "Some credentials may be required for $username"
+                 sleep 5.0s
+                 sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
+                 cd /home/"$username"/paru || return
+                 sudo -u "$username" makepkg -si
+                 cd || return
+                 sleep 3.0s
         esac
     else
         clear
@@ -181,7 +185,7 @@ de_select () {
   print "2) GNOME"
   print "3) KDE"
   print "4) XFCE"
-  print "0) [CANCEL] (Return to GUi select screen.)"
+  print "0) [CANCEL] (Return to GUI select screen.)"
   read -r -p "Please select an option (0-4): " choice
   case $choice in
     0 ) print "Returning to GUI select screen..."
@@ -190,31 +194,36 @@ de_select () {
 	    ;;
     1 )	DE="Cinnamon"
         clear
-        print_i "You Selected $DE"
-        print "$DE is a desktop environment best suited for"
-        print "users who are most comfortable with Windows 7"
+        print "You Selected $DE"
+        echo -e "\n"
+        print_i "$DE is a desktop environment best suited for"
+        print_b "users who are most comfortable with Windows 7"
 	    de_selection_check
 	    ;;
     2 ) DE="GNOME"
         clear
-	    print_i "You Selected $DE"
-        print "$DE is a very simplistic modern desktop environment"
-        print "best suited for users who are used to OSX(Macintosh)"
+	    print "You Selected $DE"
+        echo -e "\n"
+        print_i "$DE is a very simplistic modern desktop environment"
+        print_b "best suited for users who are used to OSX(Macintosh)"
 	    de_selection_check
 	    ;;
     3 ) DE=KDE
         clear
-	    print_i "You Selected $DE"
-        print "$DE is a very modern desktop environment built"
-        print "with Windows 10/11 users in mind"
+	    print "You Selected $DE"
+        echo -e "\n"
+        print_i "$DE is a very modern desktop environment built"
+        print_b "with Windows 10/11 users in mind"
 	    de_selection_check
         ;;
     4 ) DE="XFCE"
         clear
-        print_i "You Selected $DE"
-	    print "$DE is an older desktop environment closely resembling"
-        print "Windows XP in terms of look and feel."
-        print_i "This DE is best suited for computers with old hardware."
+        print "You Selected $DE"
+        echo -e "\n"
+	    print_i "$DE is an older desktop environment closely resembling"
+        print_b "Windows XP in terms of look and feel."
+        echo -e "\n"
+        print_i "This DE is best suited for computers with older hardware."
         de_selection_check
 	    ;;
     * ) print_w "That is not a valid selection."
@@ -257,33 +266,40 @@ wm_select () {
         ;;
     1 )	WM="Awesome"
         clear
-        print_i "You Selected $WM"
-        print "$WM WM is written and configured in lua and uses"
-        print "the asynchronous XCB library instead of the old synchronous Xlib."
-        print_w "\nSome knowledge in the lua language is recommended"
+        print "You selected $WM Window Manager"
+        echo -e "\n"
+        print_i "$WM WM is written and configured in lua and uses"
+        print_b "the asynchronous XCB library instead of the old synchronous Xlib."
+        echo -e "\n"
+        print_w "Some knowledge in the lua language is recommended"
         print_y "please check awesomewm.org for more information."
 	    wm_selection_check
 	    ;;
     2 ) WM="BSPWM"
         clear
-	    print_i "You Selected $WM"
-        print "$WM is a fibonacci spiralling WM written in C and mainly configued"
-        print "in shell script but can be configured in any language you chose."
-        print "Uses the asynchornous XCB library instead of Xlib."
-        print_w "\nThis window manager has a difficult learning curve."
+	    print "You selected $WM Window Manager"
+        echo -e "\n"
+        print_i "$WM is a fibonacci spiralling WM written in C and mainly configued"
+        print_b "in shell script but can be configured in any language you chose."
+        print_b "Uses the asynchornous XCB library instead of Xlib."
+        echo -e "\n"
+        print_w "This window manager has a difficult learning curve."
         print_y "and is not suited for the faint of heart."
-        print_y "Please keep in mind that $WM has limited layouts."
-        print_w "\nPlease check the $WM github page for more details."
+        print_y "Please keep in mind that $WM also has limited layouts."
+        echo -e "\n"
+        print_w "Please check the $WM github page for more details."
         print_y "If you chose to install BSPWM please read the man"
         print_y "pages for $WM and BSPC for more help."
 	    wm_selection_check
 	    ;;
     3 ) WM="DWM"
         clear
-	    print_i "You Selected $WM"
-        print "$WM is built around the suckless philosophy of doing one thing,"
-        print "and doing it right. This WM is written and configured in C."
-        print_w "\nSome knowledge in the c language is required to configure"
+	    print "You Selected $WM Window Manager"
+        echo -e "\n"
+        print_i "$WM is built around the suckless philosophy of doing one thing,"
+        print_b "and doing it right. This WM is written and configured in C."
+        echo -e "\n"
+        print_w "Some knowledge in the c language is required to configure"
         print_y "this WM. Config file (config.h) must be recompiles whenever"
         print_y "making configuration changes. See dwm.suckless.org"
         print_y "for more informations."
@@ -291,34 +307,39 @@ wm_select () {
         ;;
     4 ) WM="i3"
         clear
-        print_i "You Selected $WM"
-	    print "$WM WM is written in C. $WM is the simplest WM"
-        print "for first time WM users as it is configured in a"
-        print "simple scripting language very similar to english."
-        print_w "\nPlease check i3wm.org for more information."
+        print "You Selected $WM Window Manager"
+        echo -e "\n"
+	    print_i "$WM WM is written in C. $WM is the simplest WM"
+        print_b "for first time WM users as it is configured in a"
+        print_b "simple scripting language very similar to english."
+        print_b "\nPlease check i3wm.org for more information."
         wm_selection_check
 	    ;;
     5 ) WM="Sway"
         clear
-        print_i "You Selected $WM"
-	    print "$WM is drop in replacement fro i3WM written for Wayland."
+        print "You Selected $WM Window Manager"
+        echo -e "\n"
+	    print "$WM is drop in replacement for i3 WM written for Wayland."
+        echo -e "\n"
         print_w "\nIf you are an Nvidia user please do not install this"
         print_y "WM at the moment as Wayland is not well supported on"
         print_y "these GPUs"
-        print_w "\nPlease check phoronix.com for updates on Nvidia"
+        print_y "Please check phoronix.com for updates on Nvidia"
         print_y "drivers in linux if you are interested in this wm."
         wm_selection_check
 	    ;;
     6 ) WM="XMonad"
         clear
-        print_i "You Selected $WM"
-	    print "$WM is a highly extensible WM written and configured in haskell."
-        print "Haskell is a purely functional programming language."
-        print "XMonad includes a contib which will be installed filled"
-        print "with many modifications created by the community."
-        print_w "]nHaskell is a very difficult programming language."
-        print_y "If you are unfamiliar with it please do some research"
-        print_y "first before picking this WM. Also check,"
+        print "You Selected $WM"
+        echo -e "\n"
+	    print_i "$WM is a highly extensible WM written and configured in haskell."
+        print_b "Haskell is a purely functional programming language."
+        print_b "XMonad includes a contib which will also be installed, filled"
+        print_b "with many modifications created by the community."
+        echo -e "\n"
+        print_w "Haskell is a very difficult programming language for those"
+        print_y "unfamiliar to programming. If you are unfamiliar with it"
+        print_y "please do some research first before picking this WM. Also check,"
         print_y "xmonad.org for more information."
         wm_selection_check
 	    ;;
@@ -529,7 +550,7 @@ audio_1 () {
             sleep 2.0s
             audio_1
             ;;
-        * ) print-w "\nNot a valid selection"
+        * ) print_w "\nNot a valid selection"
             sleep 3.0s
             audio_1
     esac
@@ -574,7 +595,7 @@ browser_1 () {
             sleep 2.0s
             browser_1
             ;;
-        * ) print-w "\nNot a valid selection"
+        * ) print_w "\nNot a valid selection"
             sleep 3.0s
             browser_1
     esac
@@ -584,7 +605,7 @@ browser_1 () {
 email_1 () {
     clear
     print "***Email Clients***"
-    print "1) Evolution"
+    print "\n1) Evolution"
     print "2) Geary"
     print "3) Mutt (advanced user only)"
     print "4) Neomutt (advanced users only)"
@@ -636,7 +657,7 @@ email_1 () {
 gaming_1 () {
     clear
     print "***Gaming Software***"
-    print "1) Lutris"
+    print "\n1) Lutris"
     print "2) Steam"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -667,7 +688,7 @@ gaming_1 () {
 graphics_1 () {
     clear
     print "***Graphics Software***"
-    print "1) GIMP"
+    print "\n1) GIMP"
     print "2) Inkscape"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -688,7 +709,7 @@ graphics_1 () {
             sleep 2.0s
             graphics_1
             ;;
-        * ) print-w "\nNot a valid selection"
+        * ) print_w "\nNot a valid selection"
             sleep 3.0s
             graphics_1
     esac
@@ -698,7 +719,7 @@ graphics_1 () {
 office_1 () {
     clear
     print "***Office Suites***"
-    print "1) LibreOffice-Fresh (Development)"
+    print "\n1) LibreOffice-Fresh (Development)"
     print "2) LibreOffice-Still (LTS)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -830,7 +851,7 @@ browser_2 () {
 email_2 () {
     clear
     print "***Email Clients***"
-    print "1) Kmail"
+    print "\n1) Kmail"
     print "2) Mutt (advanced user only)"
     print "3) Neomutt (advanced users only)"
     print "4) Thunderbird"
@@ -875,7 +896,7 @@ email_2 () {
 gaming_2 () {
     clear
     print "***Gaming Software***"
-    print "1) Lutris"
+    print "\n1) Lutris"
     print "2) Steam"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -906,7 +927,7 @@ gaming_2 () {
 graphics_2 () {
     clear
     print "***Graphics Software***"
-    print "1) Krita"
+    print "\n1) Krita"
     print "2) Inkscape"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -937,7 +958,7 @@ graphics_2 () {
 office_2 () {
     clear
     print "***Office Suites***"
-    print "1) Calligra Suite"
+    print "\n1) Calligra Suite"
     print "2) LibreOffice-Fresh (Development)"
     print "3) LibreOffice-Still (LTS)"
     print "0) [NONE] (Main Menu)"
@@ -1069,7 +1090,7 @@ browser_3 () {
 email_3 () {
     clear
     print "***Email Clients***"
-    print "1) Evolution"
+    print "\n1) Evolution"
     print "2) Geary"
     print "3) Mutt (advanced user only)"
     print "4) NeoMutt (advanced users only)"
@@ -1165,7 +1186,7 @@ file_manager () {
 gaming_3 () {
     clear
     print "***Gaming Software***"
-    print "1) Lutris"
+    print "\n1) Lutris"
     print "2) Steam"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -1196,7 +1217,7 @@ gaming_3 () {
 graphics_3 () {
     clear
     print "***Graphics Software***"
-    print "1) GIMP"
+    print "\n1) GIMP"
     print "2) Inkscape"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -1227,7 +1248,7 @@ graphics_3 () {
 office_3 () {
     clear
     print "***Office Suites***"
-    print "1) LibreOffice-Fresh (Development)"
+    print "\n1) LibreOffice-Fresh (Development)"
     print "2) LibreOffice-Still (LTS)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-2): " choice
@@ -1288,18 +1309,19 @@ shell_env () {
 terminal_emulator () {
     clear
     print "***Terminal Emulators***"
-    print "1) Alacritty"
+    print "\n1) Alacritty"
     print "2) cool-retro-term"
-    print "3) Kitty"
+    print "3) kitty"
     print "4) rxvt-unicode"
     print "5) xterm"
     print "0) [NONE] (Main Menu)"
-    read -r -p "Please select one (0-5): " choice
+    read -r -p "Please select one and only one (0-5): " choice
     case $choice in
         0 ) print_i "Returning to main menu..."
-            print_w "\nKeep in mind that a window manager"
+            echo -e "\n"
+            print_w "Keep in mind that a window manager"
             print_y "requires a terminal emulator to function."
-            sleep 2.0s
+            sleep 6.0s
             package_selector_3
             ;;
         1 ) clear
@@ -1315,7 +1337,7 @@ terminal_emulator () {
             terminal_emulator
             ;;
         3 ) clear
-            print_i "Installing Kitty..."
+            print_i "Installing kitty..."
             pacman -S kitty
             sleep 2.0s
             terminal_emulator
@@ -1341,7 +1363,7 @@ terminal_emulator () {
 text_editor () {
     clear
     print "***Text Editors***"
-    print "1) Atom"
+    print "\n1) Atom"
     print "2) Emacs"
     print "3) Kakoune"
     print "4) Nano"
@@ -1352,7 +1374,8 @@ text_editor () {
     read -r -p "Please select one (0-7): " choice
     case $choice in
         0 ) print_i "Returning to main menu..."
-            print_w "\nKeep in mind that a window manager"
+            echo -e "\n"
+            print_w "Keep in mind that a window manager"
             print_y "requires a text editor to function."
             sleep 2.0s
             package_selector_3
@@ -1526,7 +1549,6 @@ install_wm () {
         print "$WM window manager will now be installed."
         print "Along with some other usefull applications..."
         sleep 3.0s
-        clear
         pacman -S --noconfirm archlinux-appstream-data arandr audacity awesome blueman \
             bottom bzip2 cups cups-pdf dmenu dpkg dunst feh galculator gnome-disk-utility \
             gpick gvfs lxappearance-gtk3 lxsession maim meld mpv networkmanager \
@@ -1539,14 +1561,25 @@ install_wm () {
             zathura zathura-pdf-mupdf zathura-ps zip
 
         clear
-        print "Some Systemd services will now be enabled..."
-        sleep 2.0s
-        # CP /etc/xinitrc to $username home && add awesome init
+        print "Some initializitaion is occuring, please wait..."
+        print_i "Some credentials may be required for $username."
+        sleep 5.0s
+        sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec awesome/' /home/"$username"/xinitrc
+        sudo -u "$username" mkdir -p /home/"$username"/.config/awesome/
+        sudo -u "$username" cp /etc/xdg/awesome/rc.lua /home/"$username"/.config/awesome/
+        clear
+        print_i "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
         systemctl enable cups.socket
         systemctl enable lightdm.service
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
+        sleep 3.0s
+        clear
+        print_i "$WM Window Manager installation complete!"
         sleep 3.0s
     fi
 
@@ -1556,7 +1589,6 @@ install_wm () {
         print "$WM will now be installed."
         print "Along with some other usefull applications..."
         sleep 3.0s
-        clear
         pacman -S --noconfirm archlinux-appstream-data arandr audacity blueman bottom bspwm bzip2 \
             cups cups-pdf dmenu dpkg dunst feh galculator gnome-disk-utility \
             gpick gvfs lxappearance-gtk3 lxsession maim meld mpv networkmanager \
@@ -1568,14 +1600,40 @@ install_wm () {
             xorg-server xorg-xprop xorg-xinit xorg-xsetroot youtube-dl \
             zathura zathura-pdf-mupdf zathura-ps zip
         clear
-        print "Some Systemd services will now be enabled..."
-        sleep 2.0s
-        # CP xinitrc
+        read -r -p "Please enter the name of the terminal you will be using: " choice
+        case $choice in
+            Alacritty ) term_choice=Alacritty
+                        ;;
+            cool-retro-term ) term_choice=cool-retro-term
+                              ;;
+            kitty ) term_choice=kitty
+                    ;;
+            rxvt-unicode ) term_choice=rxvt-unicode
+                            ;;
+            xterm ) term_choice=xterm
+                    ;;
+            * ) print_w "You did not enter a valid selection please try again."
+                read -r -p "Please enter the name of the terminal you will be using: " choice   
+        esac
+        clear
+        print "Some initialization is occuring, please wait..."
+        print_i "Some information may be required for $username"
+        sleep 5.0s
+        sudo -u "$username" install -Dm755 /usr/share/doc/bspwm/examples/bspwmrc \
+        /home/"$username"/.config/bspwm/bspwmrc
+        sudo -u "$username" install -Dm644 /usr/share/doc/bspwm/examples/sxhkdrc \
+        /home/"$username"/.config/sxhkd/sxhkdrc
+        sudo -u "$username" sed -i "s/urxvt/$term_choice/" /home/"$username"/.config/sxhkd/sxhkdrc
+        clear
+        print_i "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
         systemctl enable cups.socket
         systemctl enable lightdm.service
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
+        sleep 3.0s
+        clear
+        print_i "$WM installation complete!"
         sleep 3.0s
     fi
 
@@ -1584,12 +1642,12 @@ install_wm () {
         clear
         print "$WM will now be installed."
         print "Along with some other usefull applications..."
-        sleep 3.0s
-        clear
-        git clone https://git.suckless.org/dwm/
-        cd dwm || return
-        make
-        make install
+        print_i "Some credentials may be required for $username"
+        sleep 5.0s
+        sudo -u "$username" git clone https://git.suckless.org/dwm/ /home/"$username"/dwm/
+        cd /home/"$username"/dwm/ || return
+        sudo -u "$username" make
+        sudo -e "$username" make install
         cd || return
         pacman -S --noconfirm archlinux-appstream-data arandr audacity blueman bottom bzip2 \
             cups cups-pdf dmenu dpkg dunst feh galculator gnome-disk-utility \
@@ -1602,14 +1660,23 @@ install_wm () {
             xorg-server xorg-xprop xorg-xinit xorg-xsetroot youtube-dl \
             zathura zathura-pdf-mupdf zathura-ps zip
         clear
+        print "Some initialization is occuring, please wait..."
+        print_i "Some credentials may be required for $username."
+        sleep 5.0s
+        sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec dwm/' /home/"$username"/xinitrc
+        clear
         print "Some Systemd services will now be enabled..."
-        sleep 2.0s
-        # CP xinitrc
         systemctl enable bluetooth.service
         systemctl enable cups.socket
         systemctl enable lightdm.service
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
+        sleep 3.0s
+        clear
+        print_i "$WM installation complete!"
         sleep 3.0s
     fi
 
@@ -1631,15 +1698,23 @@ install_wm () {
             xorg-server xorg-xprop xorg-xinit xorg-xsetroot youtube-dl \
             zathura zathura-pdf-mupdf zathura-ps zip
         clear
-        print "Some Systemd services will now be enabled..."
-        sleep 2.0s
-        sed -i 's/#logind-check-graphical=false/logind-check-graphical=true/g' /etc/lightdm/lightdm.conf
-        sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-gtk-greeter/g' /etc/lightdm/lightdm.conf
+        print "Some initialization is occuring, please wait..."
+        print_i "Some credentials may be required for $username"
+        sleep 5.0s
+        sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec i3/' /home/"$username"/xinitrc
+        clear
+        print_i "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
         systemctl enable cups.socket
         systemctl enable lightdm.service
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
+        sleep 3.0s
+        clear
+        print_i "$WM Window Manager installation complete!"
         sleep 3.0s
     fi
 
@@ -1649,7 +1724,6 @@ install_wm () {
         print "$WM window manager will now be installed."
         print "Along with some other usefull applications..."
         sleep 3.0s
-        clear
         pacman -S --noconfirm archlinux-appstream-data arandr audacity blueman bottom bzip2 \
             cups cups-pdf dmenu dpkg dunst feh galculator gnome-disk-utility \
             gpick gvfs lxappearance-gtk3 lxsession maim meld mpv networkmanager \
@@ -1661,15 +1735,17 @@ install_wm () {
             xorg-server xorg-xprop xorg-xinit xorg-xsetroot youtube-dl \
             zathura zathura-pdf-mupdf zathura-ps zip
         clear
-        print "Some Systemd services will now be enabled..."
-        sleep 2.0s
-        # CP xinitrc
+        print_i "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
         systemctl enable cups.socket
         systemctl enable lightdm.service
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
         sleep 3.0s
+        clear
+        print_i "$WM Window Manager installation complete!"
+        print_b "Type sway and hit [ENTER] to run sway after reboot."
+        sleep 5.0s
     fi
 
     if [ "$WM" == "XMonad" ]
@@ -1678,7 +1754,6 @@ install_wm () {
         print "$WM window manager will now be installed."
         print "Along with some other usefull applications..."
         sleep 3.0s
-        clear
         pacman -S --noconfirm archlinux-appstream-data arandr audacity blueman bottom bzip2 \
             cups cups-pdf dmenu dpkg dunst feh galculator gnome-disk-utility \
             gpick gvfs lxappearance-gtk3 lxsession maim meld mpv networkmanager \
@@ -1690,14 +1765,43 @@ install_wm () {
             xmonad xmonad-contrib xmobar xorg-server xorg-xprop xorg-xinit xorg-xsetroot \
             youtube-dl zathura zathura-pdf-mupdf zathura-ps zip
         clear
+        read -r -p "Please enter the name of the terminal you will be using: " choice
+        case $choice in
+            Alacritty ) term_choice=Alacritty
+                        ;;
+            cool-retro-term ) term_choice=cool-retro-term
+                              ;;
+            kitty ) term_choice=kitty
+                    ;;
+            rxvt-unicode ) term_choice=rxvt-unicode
+                            ;;
+            xterm ) term_choice=xterm
+                    ;;
+            * ) print_w "You did not enter a valid selection please try again."
+                read -r -p "Please enter the name of the terminal you will be using: " choice   
+        esac
+        clear
+        print "Some initialization is occuring, please wait..."
+        print_i "Some information may be required for $username"
+        sleep 5.0s
+        sudo -u "$username" mkdir /home/"$username"/.xmonad
+        sudo -u "$username" touch /home/"$username"/xmonad/xmonad.hs
+        sudo -u "$username" echo "import XMonad \nmain = xmonad def { terminal = $term_choice }" \
+        | tee /home/"$username"/.xmonad/xmonad.hs
+        sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec xmonad/' /home/"$username"/xinitrc
+        clear
         print "Some Systemd services will now be enabled..."
-        sleep 2.0s
-        # CP xinitrc
         systemctl enable bluetooth.service
         systemctl enable cups.socket
         systemctl enable lightdm.service
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
+        sleep 3.0s
+        clear
+        print_i "$WM Window Manager installation complete!"
         sleep 3.0s
     fi
 }
@@ -1715,7 +1819,7 @@ clear
 # Installation
 welcome
 continue_check
-#paru_install
+paru_install
 gui_selector
 de_wm
 de_wm_package_selector
@@ -1728,7 +1832,7 @@ print "Installation complete!"
 print "Deleting script and rebooting in 15.0s"
 sleep 15.0s
 
-rm -rf /etc/profile/gui-installer.sh
+rm -rf /etc/profile.d/gui-installer.sh
 reboot
 
 # Exit script.

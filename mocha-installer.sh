@@ -27,6 +27,11 @@ print_w () {
     echo -e "\x1b[0;33m[w] $1\e[0m"
 }
 
+# Yellow text print warnings (without the [w]).
+print_y () {
+    echo -e "\x1b[0;33m$1\e[0m"
+}
+
 # Check if script is being ran as root and exit if it isn't.
 root_check () {
     if [ "$EUID" -ne 0 ] 
@@ -48,8 +53,8 @@ welcome () {
     print "#                            #"
     print "##############################"
     echo -e "\n"
-    print_i "NOTE: this install script is intended for"
-    print_b "UEFI based systems and does not support BIOS boot."
+    print_w "NOTE: this install script is intended for"
+    print_y "UEFI based systems and does not support BIOS boot."
 }
 
 # Ask the user if they want to install this script.
