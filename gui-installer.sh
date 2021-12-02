@@ -525,7 +525,7 @@ audio_1 () {
     print "\n1) cmus"
     print "2) Lollypop"
     print "3) Rhythmbox"
-    print "4) Spotify"
+    print "4) Spotify (AUR)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
     case $choice in
@@ -553,7 +553,7 @@ audio_1 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
-            paru -S spotify
+            sudo -u "$username" paru -S spotify
             sleep 2.0s
             audio_1
             ;;
@@ -567,9 +567,9 @@ audio_1 () {
 browser_1 () {
     clear
     print "***Web Browsers***"
-    print "\n1) Brave"
+    print "\n1) Brave (AUR)"
     print "2) Chromium"
-    print "3) Edge (beta)"
+    print "3) Edge: currently in beta (AUR)"
     print "4) Firefox"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
@@ -580,7 +580,7 @@ browser_1 () {
             ;;
         1 ) clear
             print_i "Installing Brave..."
-            paru -S brave-bin
+            sudo -u "$username" paru -S brave-bin
             sleep 2.0s
             browser_1
             ;;
@@ -592,7 +592,7 @@ browser_1 () {
             ;;
         3 ) clear
             print_i "Installing Edge..."
-            paru -S microsoft-edge-beta-bin
+            sudo -u "$username" paru -S microsoft-edge-beta-bin
             sleep 2.0s
             browser_1
             ;;
@@ -764,7 +764,7 @@ audio_2 () {
     print "\n1) Audacious"
     print "2) cmus"
     print "3) Elisa (Also installs vlc)"
-    print "4) Spotify"
+    print "4) Spotify (AUR)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
     case $choice in
@@ -792,7 +792,7 @@ audio_2 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
-            paru -S spotify
+            sudo -u "$username" paru -S spotify
             sleep 2.0s
             audio_2
             ;;
@@ -806,9 +806,9 @@ audio_2 () {
 browser_2 () {
     clear
     print "***Web Browsers***"
-    print "\n1) Brave"
+    print "\n1) Brave (AUR)"
     print "2) Chromium"
-    print "3) Edge (beta)"
+    print "3) Edge: currently in beta (AUR)"
     print "4) Falkon"
     print "5) Firefox"
     print "0) [NONE] (Main Menu)"
@@ -820,7 +820,7 @@ browser_2 () {
             ;;
         1 ) clear
             print_i "Installing Brave..."
-            paru -S brave-bin
+            sudo -u "$username" paru -S brave-bin
             sleep 2.0s
             browser_2
             ;;
@@ -1010,7 +1010,7 @@ audio_3 () {
     print "\n1) cmus"
     print "2) Lollypop"
     print "3) Rhythmbox"
-    print "4) Spotify"
+    print "4) Spotify (AUR)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
     case $choice in
@@ -1038,7 +1038,7 @@ audio_3 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
-            paru -S spotify
+            sudo -u "$username" paru -S spotify
             sleep 2.0s
             audio_3
             ;;
@@ -1052,9 +1052,9 @@ audio_3 () {
 browser_3 () {
     clear
     print "***Web Browsers***"
-    print "\n1) Brave"
+    print "\n1) Brave (AUR)"
     print "2) Chromium"
-    print "3) Edge (beta)"
+    print "3) Edge: currently in beta (AUR)"
     print "4) Firefox"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
@@ -1065,7 +1065,7 @@ browser_3 () {
             ;;
         1 ) clear
             print_i "Installing Brave..."
-            paru -S brave-bin
+            sudo -u "$username" paru -S brave-bin
             sleep 2.0s
             browser_3
             ;;
@@ -1077,7 +1077,7 @@ browser_3 () {
             ;;
         3 ) clear
             print_i "Installing Edge..."
-            paru -S microsoft-edge-beta-bin
+            sudo -u "$username" paru -S microsoft-edge-beta-bin
             sleep 2.0s
             browser_3
             ;;
@@ -1376,7 +1376,7 @@ text_editor () {
     print "4) Nano"
     print "5) Neovim"
     print "6) Vim"
-    print "7) VScode"
+    print "7) VScode (AUR)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-7): " choice
     case $choice in
@@ -1425,7 +1425,7 @@ text_editor () {
             ;;
         7 ) clear
             print_i "Installing VScode"
-            paru -S visual-studio-code-bin
+            sudo -u "$username" paru -S visual-studio-code-bin
             sleep 2.0s
             text_editor
             ;;
