@@ -1490,6 +1490,7 @@ install_de () {
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
         sleep 3.0s
+        the_end
     fi
 
     if [ "$DE" == "GNOME" ]
@@ -1513,6 +1514,7 @@ install_de () {
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
         sleep 3.0s
+        the_end
     fi
 
     if [ "$DE" == "KDE" ]
@@ -1542,6 +1544,7 @@ install_de () {
         systemctl enable sddm.service
         systemctl enable ufw.service
         sleep 3.0s
+        the_end
     fi
 
     if [ "$DE" == "XFCE" ]
@@ -1569,6 +1572,7 @@ install_de () {
         systemctl enable NetworkManager.service
         systemctl enable ufw.service
         sleep 3.0s
+        the_end
     fi
 
 }
@@ -1612,7 +1616,9 @@ install_wm () {
         sleep 3.0s
         clear
         print_i "$WM Window Manager installation complete!"
+        print_b "Type startsx and hit [ENTER] when logging in after reboot."
         sleep 3.0s
+        the_end
     fi
 
     if [ "$WM" == "BSPWM" ]
@@ -1670,7 +1676,9 @@ install_wm () {
         sleep 3.0s
         clear
         print_i "$WM installation complete!"
+        print_b "Type startsx and hit [ENTER] when logging in after reboot."
         sleep 3.0s
+        the_end
     fi
 
     if [ "$WM" == "DWM" ]
@@ -1713,7 +1721,9 @@ install_wm () {
         sleep 3.0s
         clear
         print_i "$WM installation complete!"
+        print_b "Type startsx and hit [ENTER] when logging in after reboot."
         sleep 3.0s
+        the_end
     fi
 
     if [ "$WM" == "i3-Gaps" ]
@@ -1751,7 +1761,9 @@ install_wm () {
         sleep 3.0s
         clear
         print_i "$WM Window Manager installation complete!"
+        print_b "Type startsx and hit [ENTER] when logging in after reboot."
         sleep 3.0s
+        the_end
     fi
 
     if [ "$WM" == "Sway" ]
@@ -1782,6 +1794,7 @@ install_wm () {
         print_i "$WM Window Manager installation complete!"
         print_b "Type sway and hit [ENTER] to run sway after reboot."
         sleep 5.0s
+        the_end
     fi
 
     if [ "$WM" == "XMonad" ]
@@ -1838,8 +1851,23 @@ install_wm () {
         sleep 3.0s
         clear
         print_i "$WM Window Manager installation complete!"
+        print_b "Type startsx and hit [ENTER] when logging in after reboot."
         sleep 3.0s
+        the_end
     fi
+}
+
+# End of the script
+the_end () {
+    clear
+    print "Installation complete!"
+    print "Deleting script and rebooting in 15.0s"
+    sleep 15.0s
+
+    rm -rf /etc/profile.d/gui-installer.sh
+    reboot
+    # Exit script.
+    exit
 }
 
 ###############
@@ -1861,15 +1889,3 @@ de_wm
 de_wm_package_selector
 install_de
 install_wm
-
-# End of script.
-clear
-print "Installation complete!"
-print "Deleting script and rebooting in 15.0s"
-sleep 15.0s
-
-rm -rf /etc/profile.d/gui-installer.sh
-reboot
-
-# Exit script.
-exit
