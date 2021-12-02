@@ -120,8 +120,11 @@ create_partitions () {
         mklabel gpt \
         mkpart ESP fat32 1MiB 251MiB \
         set 1 esp on \
+        name 1 efi \
         mkpart primary linux-swap 251Mib 6.26GiB \
+        name 2 swap \
         mkpart primary ext4 6.26GiB 100% \
+        name 3 root \
     sleep 5.0s
 }
 
@@ -314,7 +317,7 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
         pacman -Syy
         pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
@@ -325,7 +328,7 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
         pacman -Syy
         pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
@@ -336,7 +339,7 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
         pacman -Syy
         pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
@@ -347,7 +350,7 @@ gpu_driver_check () {
         clear
         print "AMD graphics detected. Installing drivers now..."
         sleep 3.0s
-        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
         pacman -Syy
         pacman -S --noconfirm mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon mesa-vdpau lib32-mesa-vdpau
         sleep 2.0s
@@ -404,18 +407,18 @@ paru_install () {
             [Yy] ) clear
                    print "Installing paru now..."
                    sleep 2.0s
-                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git
-                   arch-chroot /mnt/paru sudo -u "$username" makepkg -si
+                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git /tmp/paru
+                   arch-chroot /mnt/tmp/paru sudo -u "$username" makepkg -si
                    sleep 3.0s
                    ;;
             "" ) clear
                    print "Installing paru now..."
                    sleep 2.0s
-                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git
-                   arch-chroot /mnt/paru sudo -u "$username" makepkg -si
+                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git /tmp/paru
+                   arch-chroot /mnt/tmp/paru sudo -u "$username" makepkg -si
         esac
     else
-        print_w "You did not create a user or install paru."
+        print_w "You did not create a user and/or install paru."
         print_y "Most of the packages in the script ran after reboot"
         print_y "labeled (AUR) will not be installable."
     fi
