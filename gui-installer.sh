@@ -83,47 +83,42 @@ continue_check () {
 
 # Ask user about AUR support. Install if yes.
 paru_install () {
-    if [ -n "$username" ]
-        then
-        clear
-        print "Would you like to install paru for AUR support?"
-        echo -e "\n"
-        print_i "The Arch User Repositories feature thousands"
-        print_b "of packages not features in the main repos."
-        echo -e "\n"
-        print_w "Many packages the script that runs after reboot"
-        print_y "require AUR support. They will be labeled (AUR)."
-        read -r -p "Answer (y/n): " choice
-        case $choice in
-            [Nn] ) print "Continuing..."
-                   sleep 2.0s
-                   ;;
-            [Yy] ) clear
-                   print "Installing paru now..."
-                   print_i "Some credentials may be required for $username"
-                   sleep 5.0s
-                   sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
-                   cd /home/"$username"/paru || return
-                   sudo -u "$username" makepkg -si
-                   cd || return
-                   sleep 3.0s
-                   ;;
-            "" ) clear
-                 print "Installing paru now..."
-                 print_i "Some credentials may be required for $username"
-                 sleep 5.0s
-                 sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
-                 cd /home/"$username"/paru || return
-                 sudo -u "$username" makepkg -si
-                 cd || return
-                 sleep 3.0s
-        esac
-    else
-        clear
-        print_w "You did not install paru. Most of the packages"
-        print_y "in this script require AUR support in order to be installed"
-        print_y "labeled (AUR) will not be installable."
-    fi
+    clear
+    print "Would you like to install paru for AUR support?"
+    echo -e "\n"
+    print_i "The Arch User Repositories feature thousands"
+    print_b "of packages not features in the main repos."
+    echo -e "\n"
+    print_w "Many packages the script that runs after reboot"
+    print_y "require AUR support. They will be labeled (AUR)."
+    read -r -p "Answer (y/n): " choice
+    case $choice in
+        [Nn] ) clear
+               print_w "You did not install paru. Most of the packages"
+               print_y "in this script require AUR support in order to be installed"
+               print_y "labeled (AUR) will not be installable."
+                sleep 10.0s
+                ;;
+        [Yy] ) clear
+               print "Installing paru now..."
+               print_i "Some credentials may be required for $username"
+               sleep 5.0s
+               sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
+               cd /home/"$username"/paru || return
+               sudo -u "$username" makepkg -si
+               cd || return
+               sleep 3.0s
+               ;;
+        "" ) clear
+             print "Installing paru now..."
+             print_i "Some credentials may be required for $username"
+             sleep 5.0s
+             sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
+             cd /home/"$username"/paru || return
+             sudo -u "$username" makepkg -si
+             cd || return
+             sleep 3.0s
+    esac
 }
 
 # Select whether to install a desktop environment or window manager.
