@@ -115,7 +115,7 @@ disk_confirm () {
     esac
 }
 
-# Ask about memory size and set swap varriable accoringly.
+# Ask about memory size and set swap varriable accoringly. [IN PROGRESS]
 # swap_selector () {}
 
 
@@ -165,6 +165,9 @@ microcode_detector () {
         microcode="intel-ucode"
     fi
 }
+
+# Laptop check (Install acpi & acpid)
+#check_laptop () {}
 
 # Selecting a kernel to install. 
 kernel_selector () {
@@ -402,12 +405,12 @@ copy_important () {
     if [ -n "$username" ]
         then
         # Make the GUI install script writable
-        chmod +w ~/mochabaer97-installer/gui-installer.sh
+        chmod +w ~/mocharch-installer/gui-installer.sh
         # Copy username over to GUI script
-        sed -i "s/#username=""/username=$username/g" ~/mochabear97-installer/gui-installer.sh
+        sed -i "s/#username=""/username=$username/g" ~/mocharch-installer/gui-installer.sh
         # Make the GUI script executable and copy it to /mnt/etc/profile.d/
-        chmod +x ~/mochabear97-installer/gui-installer.sh
-        cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile.d/gui-installer.sh
+        chmod +x ~/mocharch-installer/gui-installer.sh
+        cp ~/mocharch-installer/gui-installer.sh /mnt/etc/profile.d/gui-installer.sh
     else
         clear
         print_w "You did not create a user, this means the second script"
