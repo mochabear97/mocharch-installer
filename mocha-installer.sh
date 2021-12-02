@@ -7,9 +7,14 @@
 #################
 
 
-# Blue text print.
+# Green text print.
 print () {
-    echo -e "\x1b[1;94m$1\e[0m"
+    echo -e "\x1b[1;32m$1\e[0m"
+}
+
+# Blue text print info.
+print_i () {
+    echo -e "\x1b[1;94m[i] $1\e[0m"
 }
 
 # Yellow text print warnings.
@@ -21,7 +26,7 @@ print_w () {
 root_check () {
     if [ "$EUID" -ne 0 ] 
         then 
-        echo -e "Please run this sript as root."
+        print_w "Please run this sript as root."
         sleep 3.0s
         exit
     fi
@@ -37,6 +42,8 @@ welcome () {
     print "#   Version: 1.0.0           #"
     print "#                            #"
     print "##############################"
+    print "\nNOTE: this install script is intended for"
+    print "Microsoft based systems that include UEFI booting."
 }
 
 # Ask the user if they want to install this script.
@@ -60,6 +67,7 @@ continue_check () {
 intitialization () {
    clear
    print "Initializing..."
+   timedatectl set-timezone "$(curl -s http://ip-api.com/line?fields=timezone)"
    timedatectl set-ntp true
    sleep 3.0s
 }
@@ -68,7 +76,7 @@ intitialization () {
 disk_selector () {
     clear
     print "Please select the disk where Arch Linux will be installed:"
-    select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|");
+    select ENTRY in $(lsblk -dpnoNAME | grep -P "/dev/sd|nvme|");
     do
         DISK=$ENTRY
         print "Arch Linux will be installed on $DISK"
@@ -146,7 +154,7 @@ microcode_detector () {
 kernel_selector () {
     clear
     print "***Kernels***"
-    print "1) Stable: Vanilla Linux kernel with a few specific Arch Linux patches applied"
+    print "\n1) Stable: Vanilla Linux kernel with a few specific Arch Linux patches applied"
     print "2) Hardened: A security-focused Linux kernel"
     print "3) LTS: Long-term support (LTS) Linux kernel"
     print "4) Zen: A Linux kernel optimized for desktop usage"
@@ -171,10 +179,10 @@ kernel_selector () {
 network_selector () {
     clear
     print "***Network Utilities***"
-    print "1) IWD: iNet wireless daemon is a wireless daemon for Linux written by Intel (WiFi-only)"
-    print "2) NetworkManager: Universal network utility to automatically connect to networks (both WiFi and Ethernet)"
-    print "3) dhcpcd: Basic DHCP client (Ethernet only or VMs)"
-    print "4) I will do this on my own (only advanced users)"
+    print "\n1) IWD: iNet wireless daemon is a wireless daemon for Linux written by Intel (WiFi-only)"
+    print "2) dhcpcd: Basic DHCP client (Ethernet only or VMs)"
+    print "3) NetworkManager: Universal network utility to automatically connect to networks (both WiFi and Ethernet)"
+    print "4) I will do this on my own (ADVANCED USERS ONLY)"
     read -r -p "Insert the number of the corresponding networking utility. (1-4): " choice
     case $choice in
         1 ) print "Installing IWD."    
@@ -184,20 +192,20 @@ network_selector () {
             systemctl enable iwd --root=/mnt &>/dev/null
             sleep 2.0s
             ;;
-        2 ) print "Installing NetworkManager."
-            pacstrap /mnt networkmanager
-            sleep 2.0s
-            print "Enabling NetworkManager."
-            systemctl enable NetworkManager --root=/mnt &>/dev/null
-            sleep 2.0s
-            ;;
-        3 ) print "Installing dhcpcd."
+        2 ) print "Installing dhcpcd."
             pacstrap /mnt dhcpcd
             sleep 2.0s
             print "Enabling dhcpcd."
             systemctl enable dhcpcd --root=/mnt &>/dev/null
             sleep 2.0s
             ;; 
+        3 ) print "Installing NetworkManager."
+            pacstrap /mnt networkmanager
+            sleep 2.0s
+            print "Enabling NetworkManager."
+            systemctl enable NetworkManager --root=/mnt &>/dev/null
+            sleep 2.0s
+            ;;
         4 ) ;;
         * ) print_w "You did not enter a valid selection."
             sleep 2.0s
@@ -212,17 +220,17 @@ basic_install () {
     print "Installing base system now..."
     sleep 3.0s
 
-    pacstrap /mnt base $microcode $kernel linux-firmware grub efibootmgr \
-    base-devel man-db man-pages nnn neovim sudo texinfo zsh
+    pacstrap /mnt base $microcode $kernel linux-firmware git grub efibootmgr \
+    base-devel man-db man-pages os-prober sudo texinfo zsh
 }
 
 # Set a hostname for the new system.
-hostname_selector () {
+hostname_creator () {
     clear
-    read -r -p "Please enter the hostname: " hostname
+    read -r -p "Please enter the hostname for your new system: " hostname
     if [ -z "$hostname" ]; then
         print_w "You need to enter a hostname in order to continue."
-        hostname_selector
+        hostname_creator
     fi
     echo "$hostname" > /mnt/etc/hostname
 }
@@ -243,7 +251,7 @@ locale_selector () {
         print_w "en_US will be used as default locale."
         locale="en_US"
     fi
-    echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
+    sed -i "s/#$locale.UTF-8/$locale.UTF-8/g" /mnt/etc/locale.gen
     echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 }
 
@@ -264,8 +272,7 @@ system_setup () {
     print "Beginning system configuration..."
     sleep 3.0s
     print "\nSetting timezone..."
-    arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$(curl -s http://ip-api.com/line?fields=timezone)" \
-    /etc/localtime &>/dev/null
+    arch-chroot /mnt ln -sf /usr/share/zoneinfo/"$(curl -s http://ip-api.com/line?fields=timezone)" /etc/localtime &>/dev/null
     sleep 1.0s
 
     print "\nConfiguring system hardware clock..."
@@ -288,6 +295,49 @@ system_setup () {
     print "\nCreating grub config file..."
     arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
     sleep 1.0s
+}
+
+# Install GPU drivers.
+gpu_driver_install () {
+    clear
+    print "Checking for graphics card..."
+    NVIDIA_CHECK=$(lspci -k | grep -A 2 -E "(VGA|3D)" | grep -o "NVIDIA")
+    AMD_CHECK=$(lspci -k | grep -A 2 -E "(VGA|3D)" | grep -o "Advanced Micro Devices")
+    if [ "$NVIDIA_CHECK" == "NVIDIA" ] && [ $kernel == linux ]
+        then
+        clear
+        print "Nvidia graphics detected. Installing drivers now..."
+        sleep 3.0s
+        pacman -S nvidia lib32-nvidia-utils nvidia-settings
+        sleep 2.0s
+    fi
+
+    if [ "$NVIDIA_CHECK" == "NVIDIA" ] && [ $kernel == linux-lts ]
+        then
+        clear
+        print "Nvidia graphics detected. Installing drivers now..."
+        sleep 3.0s
+        pacman -S nvidia-lts lib32-nvidia-utils nvidia-settings
+        sleep 2.0s
+    fi
+
+    if [ "$NVIDIA_CHECK" == "NVIDIA" ] && [ $kernel == linux-hardened ] || [ $kernel == linux-zen ]
+        then
+        clear
+        print "Nvidia graphics detected. Installing drivers now..."
+        sleep 3.0s
+        pacman -S nvidia-dkms lib32-nvidia-utils nvidia-settings
+        sleep 2.0s
+    fi
+
+    if [ "$AMD_CHECK" == "Advanced Micro Devices" ]
+        then
+        clear
+        print "AMD graphics detected. Installing drivers now..."
+        sleep 3.0s
+        pacman -S mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon mesa-vdpau lib32-mesa-vdpau
+        sleep 2.0s
+    fi
 }
 
 # Set root password.
@@ -317,11 +367,63 @@ create_user () {
   fi
 }
 
+# Ask user about AUR support. Install if yes.
+paru_install () {
+    if [ -n "$username" ]
+        then
+        clear
+        print "Would you like to install paru for AUR support?"
+        print_i "\nThe Arch User Repositories feature thousands"
+        print_b "of packages not features in the main repos."
+        print_w "\nMany packages the script that runs after reboot"
+        print_y "require AUR support. They will be labeled (AUR)."
+        read -r -p "Answer (y/n): " choice
+        case $choice in
+            [Nn] ) print "Continuing..."
+                   sleep 2.0s
+                   ;;
+            [Yy] ) clear
+                   print "Installing paru now..."
+                   sleep 2.0s
+                   pacman -S --needed --noconfim cargo
+                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git
+                   arch-chroot /mnt cd paru
+                   arch-chroot /mnt sudo -u "$username" makepkg -si
+                   ;;
+            "" ) clear
+                   print "Installing paru now..."
+                   sleep 2.0s
+                   pacman -S --needed --noconfim cargo
+                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git
+                   arch-chroot /mnt cd paru && sudo -u "$username" makepkg -si
+        esac
+    else
+        print_w "You did not create a user or install paru."
+        print_y "Most of the packages in the script ran after reboot"
+        print_y "labeled (AUR) will not be installable."
+    fi
+}
+
+# Copy GUI install script to new system
+# to be ran after rebooting.
+copy_important () {
+    if [ -n "$username" ]
+        then
+        echo "username=$username" > ~/mochabear97-installer/gui-installer.sh
+        # Make the GUI install script executable and copy it to /mnt/etc/profile
+        chmod +x ~/mochabear97-installer/gui-installer.sh
+        cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile/
+    else
+        chmod +x ~/mochabear97-installer/gui-installer.sh
+        cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile/
+    fi
+}
 
 ###############
 #   Program   #
 ###############
 
+# Check root first
 root_check
 
 # Start by clearing the terminal
@@ -333,19 +435,23 @@ continue_check
 intitialization
 disk_selector
 disk_confirm
+#swap_selector
 create_partitions
 format_partitions
 microcode_detector
 kernel_selector
 network_selector
 basic_install
-hostname_selector
+hostname_creator
 gen_stab
 locale_selector
 keyboard_selector
 system_setup
+gpu_driver_install
 root_set
 create_user
+paru_install
+copy_important
 
 # Print a message after installing then restarts the system.
 clear
@@ -355,4 +461,6 @@ sleep 30.0s
 
 print "Exiting"
 reboot
+
+# Exit script.
 exit
