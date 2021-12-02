@@ -49,7 +49,7 @@ welcome () {
     print "##############################"
     echo -e "\n"
     print_i "NOTE: this install script is intended for"
-    print_b "Microsoft based systems that include UEFI booting."
+    print_b "UEFI based systems and does not support BIOS boot."
 }
 
 # Ask the user if they want to install this script.
@@ -111,6 +111,8 @@ disk_confirm () {
 }
 
 # Ask about memory size and set swap varriable accoringly.
+# swap_selector () {}
+
 
 # Creating a new partition scheme.
 create_partitions () {
@@ -389,54 +391,26 @@ create_user () {
   fi
 }
 
-# Ask user about AUR support. Install if yes.
-paru_install () {
-    if [ -n "$username" ]
-        then
-        clear
-        print "Would you like to install paru for AUR support?"
-        print_i "\nThe Arch User Repositories feature thousands"
-        print_b "of packages not features in the main repos."
-        print_w "\nMany packages the script that runs after reboot"
-        print_y "require AUR support. They will be labeled (AUR)."
-        read -r -p "Answer (y/n): " choice
-        case $choice in
-            [Nn] ) print "Continuing..."
-                   sleep 2.0s
-                   ;;
-            [Yy] ) clear
-                   print "Installing paru now..."
-                   sleep 2.0s
-                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git /tmp/paru
-                   arch-chroot /mnt/tmp sudo -u "$username" cd paru && makepkg -si
-                   sleep 3.0s
-                   ;;
-            "" ) clear
-                   print "Installing paru now..."
-                   sleep 2.0s
-                   arch-chroot /mnt git clone https://aur.archlinux.org/paru.git /tmp/paru
-                   arch-chroot /mnt/tmp sudo -u "$username" cd paru && makepkg -si
-        esac
-    else
-        clear
-        print_w "You did not create a user and/or install paru."
-        print_y "Most of the packages in the script ran after reboot"
-        print_y "labeled (AUR) will not be installable."
-    fi
-}
-
 # Copy GUI install script to new system
-# to be ran after rebooting.
+# to be ran after rebooting IF user was created.
 copy_important () {
     if [ -n "$username" ]
         then
-        arch-chroot /mnt bash -c export username="$username"
+        arch-chroot /mnt bash export username="$username"
         # Make the GUI install script executable and copy it to /mnt/etc/profile
         chmod +x ~/mochabear97-installer/gui-installer.sh
-        cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile/
+        cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile.d/gui-installer.sh
     else
-        chmod +x ~/mochabear97-installer/gui-installer.sh
-        cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile/
+        clear
+        print_w "You did not create a user, this means the second script"
+        print_y "will not be copied over and cannot be accessed"
+        print_y "after reboot. If you wanted to access it, please"
+        print_y "Reinstall Arch Linux using this script after reboot."
+        echo -e "\n"
+        print_i "The second script allows you to install packages and a"
+        print_b "desktop environment or window manager of your choosing"
+        print_b "It also includes an automated install of paru for AUR support if need be."
+        sleep 30.0s
     fi
 }
 
@@ -471,7 +445,6 @@ system_setup
 gpu_driver_check
 root_set
 create_user
-paru_install
 copy_important
 
 # Print a message after installing then restarts the system.
