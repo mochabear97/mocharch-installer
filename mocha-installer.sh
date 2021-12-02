@@ -358,7 +358,10 @@ gpu_driver_check () {
 root_set() {
     clear
     print "Please create a password for the root user."
-    arch-chroot /mnt passwd root
+    until arch-chroot /mnt passwd root
+    do
+        print_w "Please try again"
+    done
     sleep 3.0s
 }
 
@@ -368,10 +371,12 @@ create_user () {
   read -r -p "Please Enter a name for a user account (leave empty and press enter to skip): "  username
   if [ -n "$username" ]; then
     arch-chroot /mnt useradd -m "$username"
-    print "\nPlease enter a password for the new user."
-    arch-chroot /mnt passwd "$username"
+    print "\nPlease enter a password for $username."
+    until arch-chroot /mnt passwd "$username"
+    do
+        print_w "Please try again."
+    done
     sleep 3.0s
-    clear
     echo -e "\x1b[1;34mAdding\e[0m \x1b[0;33m$username\e[0m \x1b[1;34mwith root privileges.\e[0m"
     arch-chroot /mnt gpasswd -a "$username" adm
     arch-chroot /mnt gpasswd -a "$username" rfkill
@@ -399,17 +404,15 @@ paru_install () {
             [Yy] ) clear
                    print "Installing paru now..."
                    sleep 2.0s
-                   pacman -S --needed --noconfim cargo
                    arch-chroot /mnt git clone https://aur.archlinux.org/paru.git
-                   arch-chroot /mnt cd paru && sudo -u "$username" makepkg -si
+                   arch-chroot /mnt/paru sudo -u "$username" makepkg -si
                    sleep 3.0s
                    ;;
             "" ) clear
                    print "Installing paru now..."
                    sleep 2.0s
-                   pacman -S --needed --noconfim cargo
                    arch-chroot /mnt git clone https://aur.archlinux.org/paru.git
-                   arch-chroot /mnt cd paru && sudo -u "$username" makepkg -si
+                   arch-chroot /mnt/paru sudo -u "$username" makepkg -si
         esac
     else
         print_w "You did not create a user or install paru."
@@ -423,7 +426,7 @@ paru_install () {
 copy_important () {
     if [ -n "$username" ]
         then
-        export $username
+        arch-chroot /mnt bash -c export username="$username"
         # Make the GUI install script executable and copy it to /mnt/etc/profile
         chmod +x ~/mochabear97-installer/gui-installer.sh
         cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile/
