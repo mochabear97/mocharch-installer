@@ -118,8 +118,8 @@ create_partitions () {
     print "Creating the partitions on $DISK..."
     parted -s "$DISK" \
         mklabel gpt \
-        mkpart primary fat32 1MiB 251MiB \
-        set 1 ESP on \
+        mkpart ESP fat32 1MiB 251MiB \
+        set 1 esp on \
         mkpart primary linux-swap 251Mib 6.26GiB \
         mkpart primary ext4 6.26GiB 100% \
     sleep 5.0s
