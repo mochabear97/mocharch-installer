@@ -103,7 +103,7 @@ paru_install () {
                print "Installing paru now..."
                print_i "Some credentials may be required for $username"
                sleep 5.0s
-               pacman -S cargo
+               pacman -S --noconfirm rust cargo
                sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
                cd /home/"$username"/paru || return
                sudo -u "$username" makepkg -i
@@ -115,7 +115,7 @@ paru_install () {
              print "Installing paru now..."
              print_i "Some credentials may be required for $username"
              sleep 5.0s
-             pacman -S cargo
+             pacman -S --noconfirm rust cargo
              sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
              cd /home/"$username"/paru || return
              sudo -u "$username" makepkg -i
@@ -556,6 +556,7 @@ audio_1 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
+            curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -
             sudo -u "$username" paru -S spotify
             sleep 2.0s
             audio_1
@@ -795,6 +796,7 @@ audio_2 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
+            curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -
             sudo -u "$username" paru -S spotify
             sleep 2.0s
             audio_2
@@ -1041,6 +1043,7 @@ audio_3 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
+            curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -
             sudo -u "$username" paru -S spotify
             sleep 2.0s
             audio_3
@@ -1634,6 +1637,10 @@ install_wm () {
         sudo -u "$username" install -Dm644 /usr/share/doc/bspwm/examples/sxhkdrc \
         /home/"$username"/.config/sxhkd/sxhkdrc
         sudo -u "$username" sed -i "s/urxvt/$term_choice/" /home/"$username"/.config/sxhkd/sxhkdrc
+        sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec bspwm/' /home/"$username"/xinitrc
         clear
         print_i "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
