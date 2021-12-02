@@ -317,6 +317,7 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
+        arch-chroot /mnt pacman -Syy
         arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
         arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         pacman -Syy
@@ -329,7 +330,8 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-         arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
+        arch-chroot /mnt pacman -Syy
+        arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
         arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         arch-chroot /mnt pacman -Syy
         arch-chroot /mnt pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
@@ -341,6 +343,7 @@ gpu_driver_check () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
+        arch-chroot /mnt pacman -Syy
         arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
         arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         arch-chroot /mnt pacman -Syy
@@ -353,7 +356,8 @@ gpu_driver_check () {
         clear
         print "AMD graphics detected. Installing drivers now..."
         sleep 3.0s
-         arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
+        arch-chroot /mnt pacman -Syy
+        arch-chroot /mnt sed -i 's/\[multilib\]/\[multilib\]/g' /etc/pacman.conf
         arch-chroot /mnt sed -i 's/#Include = \/etc\/pacman.d\/mirrorlist/Include = \/etc\/pacman.d\/mirrorlist/g' /etc/pacman.conf
         arch-chroot /mnt pacman -Syy
         arch-chroot /mnt pacman -S --noconfirm mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon mesa-vdpau lib32-mesa-vdpau
@@ -422,6 +426,7 @@ paru_install () {
                    arch-chroot /mnt/tmp/paru sudo -u "$username" makepkg -si
         esac
     else
+        clear
         print_w "You did not create a user and/or install paru."
         print_y "Most of the packages in the script ran after reboot"
         print_y "labeled (AUR) will not be installable."
