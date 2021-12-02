@@ -298,7 +298,7 @@ system_setup () {
 }
 
 # Install GPU drivers if detected.
-gpu_driver_install () {
+gpu_driver_check () {
     clear
     print "Checking for graphics card..."
     NVIDIA_CHECK=$(lspci -k | grep -A 2 -E "(VGA|3D)" | grep -o "NVIDIA")
@@ -337,8 +337,6 @@ gpu_driver_install () {
     fi
 
     if [ "$AMD_CHECK" == "Advanced Micro Devices" ]
-        then
-        clear
         then
         clear
         print "AMD graphics detected. Installing drivers now..."
@@ -457,7 +455,7 @@ gen_stab
 locale_selector
 keyboard_selector
 system_setup
-gpu_driver_install
+gpu_driver_check
 root_set
 create_user
 paru_install
