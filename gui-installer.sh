@@ -421,7 +421,8 @@ package_selector_1 () {
             ;;
         6 ) office_1
             ;;
-        7 ) ;;
+        7 ) install_de
+            ;;
         * ) print_w "Please try again."
             sleep 2.0s
             main_menu
@@ -458,7 +459,8 @@ package_selector_2 () {
             ;;
         6 ) office_2
             ;;
-        7 ) ;;
+        7 ) install_de
+            ;;
         * ) print_w "Please try again."
             sleep 2.0s
             main_menu
@@ -507,7 +509,8 @@ package_selector_3 () {
             ;;
         10 ) text_editor
              ;;
-        11 ) ;;
+        11 ) install_wm
+             ;;
         * ) print_w "Please try again."
             sleep 2.0s
             main_menu
