@@ -97,18 +97,18 @@ paru_install () {
                print_w "You did not install paru. Most of the packages"
                print_y "in this script require AUR support in order to be installed"
                print_y "labeled (AUR) will not be installable."
-                sleep 10.0s
-                ;;
+               sleep 10.0s
+               ;;
         [Yy] ) clear
                print "Installing paru now..."
                print_i "Some credentials may be required for $username"
                sleep 5.0s
                pacman -S cargo
                sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
-               sudo -u "$username" cd /home/"$username"/paru || return
+               cd /home/"$username"/paru || return
                sudo -u "$username" makepkg -i
-               sudo -u "$username" rm -rm /home/"$username"/paru
-               sudo -u "$username" cd || return
+               rm -rf /home/"$username"/paru
+               cd || return
                sleep 3.0s
                ;;
         "" ) clear
@@ -117,10 +117,10 @@ paru_install () {
              sleep 5.0s
              pacman -S cargo
              sudo -u "$username" git clone https://aur.archlinux.org/paru.git /home/"$username"/paru
-             sudo -u "$username" cd /home/"$username"/paru || return
+             cd /home/"$username"/paru || return
              sudo -u "$username" makepkg -i
-             sudo -u "$username" rm -rm /home/"$username"/paru
-             sudo -u "$username" cd || return
+             rm -rf /home/"$username"/paru
+             cd || return
              sleep 3.0s
     esac
 }
