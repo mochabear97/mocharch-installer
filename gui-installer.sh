@@ -1490,7 +1490,7 @@ install_wm () {
         clear
         print "Some Systemd services will now be enabled..."
         sleep 2.0s
-        # CP /etc/xinitrc to home && add awesome init
+        # CP /etc/xinitrc to $username home && add awesome init
         systemctl enable bluetooth.service
         systemctl enable cups.socket
         systemctl enable lightdm.service
