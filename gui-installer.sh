@@ -685,7 +685,7 @@ gaming_1 () {
             ;;
         2 ) clear
             print_i "Installing Steam..."
-            pacman -S steam
+            pacman -S steam ttf-liberation
             sleep 2.0s
             gaming_1
             ;;
@@ -925,7 +925,7 @@ gaming_2 () {
             ;;
         2 ) clear
             print_i "Installing Steam..."
-            pacman -S steam
+            pacman -S steam ttf-liberation
             sleep 2.0s
             gaming_2
             ;;
@@ -1216,7 +1216,7 @@ gaming_3 () {
             ;;
         2 ) clear
             print_i "Installing Steam..."
-            pacman -S steam
+            pacman -S steam ttf-liberation
             sleep 2.0s
             gaming_3
             ;;
