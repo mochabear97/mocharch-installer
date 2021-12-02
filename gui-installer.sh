@@ -1,5 +1,6 @@
 #! /bin/bash
 
+#username=""
 
 #################
 #   Functions   #
@@ -15,6 +16,11 @@ print () {
 # Blue text print info.
 print_i () {
     echo -e "\x1b[1;94m[i] $1\e[0m"
+}
+
+# Blue text print info (without the [i]).
+print_b () {
+    echo -e "\x1b[1;94m$1\e[0m"
 }
 
 # Yellow text print warnings.
@@ -50,6 +56,9 @@ welcome () {
     print "#                            #"
     print "##############################"
     print "$username"
+    echo -e "\n"
+    print_i "This script allows you to install paru, some packages,"
+    print_b "and select a desktop environment or window manager to install."
 }
 
 # Ask the user if they want to install this script.
@@ -70,6 +79,47 @@ continue_check () {
            * ) print_w "You did not enter a valid selection."
                continue_check
     esac
+}
+
+# Ask user about AUR support. Install if yes.
+paru_install () {
+    if [ -n "$username" ]
+        then
+        clear
+        print "Would you like to install paru for AUR support?"
+        print_i "\nThe Arch User Repositories feature thousands"
+        print_b "of packages not features in the main repos."
+        print_w "\nMany packages the script that runs after reboot"
+        print_y "require AUR support. They will be labeled (AUR)."
+        read -r -p "Answer (y/n): " choice
+        case $choice in
+            [Nn] ) print "Continuing..."
+                   sleep 2.0s
+                   ;;
+            [Yy] ) clear
+                   print "Installing paru now..."
+                   sleep 2.0s
+                   git clone https://aur.archlinux.org/paru.git /paru
+                   cd /paru || return
+                   #sudo -u "$username" makepkg -si
+                   cd || return
+                   sleep 3.0s
+                   ;;
+            "" ) clear
+                   print "Installing paru now..."
+                   sleep 2.0s
+                   git clone https://aur.archlinux.org/paru.git /paru
+                   cd /paru || return
+                   #sudo -u "$username" makepkg -si
+                   cd || return
+                   sleep 3.0s
+        esac
+    else
+        clear
+        print_w "You did not install paru. Most of the packages"
+        print_y "in this script require AUR support in order to be installed"
+        print_y "labeled (AUR) will not be installable."
+    fi
 }
 
 # Select whether to install a desktop environment or window manager.
@@ -1373,7 +1423,7 @@ install_de () {
             lightdm-gtk-greeter lollypop meld neofetch networkmanager \
             network-manager-applet npm p7zip papirus-icon-theme pavucontrol \
             pulseaudio redshift simple-scan system-config-printer ufw \
-            unrar vlc wget xed xdg-utils xdg-user-dirs xorg-server xreader zip
+            unrar vlc wget xed xdg-utils xdg-user-dirs xorg-server xreader zip zsh
         clear
         print "Some Systemd services will now be enabled..."
         sleep 2.0s
@@ -1398,7 +1448,7 @@ install_de () {
             bottom bzip2 cups cups-pdf dpkg exa gimp gnome gpick materia-gtk-theme \
             meld neofetch networkmanager npm p7zip papirus-icon-theme pulseaudio \
             simple-scan system-config-printer ufw unrar vlc wget xdg-utils \
-            xorg-server zip
+            xorg-server zip zsh
         clear
         print "\nSome Systemd services will now be enabled..."
         sleep 2.0s
@@ -1426,7 +1476,8 @@ install_de () {
             npm okular oxygen p7zip plasma-desktop plasma-disks plasma-firewall plasma-nm  \
             plasma-pa plasma-systemmonitor plasma-thunderbolt plasma-vault \
             plasma-workspace-wallpapers sddm-kcm skanlite spectacle \
-            system-config-printer ufw unrar wget xdg-desktop-portal-kde xdg-utils xdg-user-dirs xorg-server zip
+            system-config-printer ufw unrar wget xdg-desktop-portal-kde \
+            xdg-utils xdg-user-dirs xorg-server zip zsh
         clear
         print "\nSome Systemd services will now be enabled..."
         sleep 2.0s
@@ -1451,7 +1502,7 @@ install_de () {
             lightdm lightdm-gtk-greeter meld neofetch networkmanager \
             network-manager-applet npm p7zip papirus-icon-theme pavucontrol \
             picom pstoedit pulseaudio redshift simple-scan system-config-printer \
-            ufw unrar vlc wget xarchiver xdg-utils xdg-user-dirs xfce4 xfce4-goodies zip
+            ufw unrar vlc wget xarchiver xdg-utils xdg-user-dirs xfce4 xfce4-goodies zip zsh
         clear
         print "Some Systemd services will now be enabled..."
         sleep 2.0s
@@ -1664,6 +1715,7 @@ clear
 # Installation
 welcome
 continue_check
+#paru_install
 gui_selector
 de_wm
 de_wm_package_selector

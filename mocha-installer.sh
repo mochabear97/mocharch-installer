@@ -232,7 +232,7 @@ basic_install () {
     sleep 3.0s
 
     pacstrap /mnt base $microcode $kernel linux-firmware git grub efibootmgr \
-    base-devel man-db man-pages os-prober sudo texinfo zsh
+    base-devel man-db man-pages os-prober sudo texinfo
 }
 
 # Set a hostname for the new system.
@@ -396,8 +396,11 @@ create_user () {
 copy_important () {
     if [ -n "$username" ]
         then
-        arch-chroot /mnt bash export username="$username"
-        # Make the GUI install script executable and copy it to /mnt/etc/profile
+        # Make the GUI install script writable
+        chmod +w ~/mochabaer97-installer/gui-installer.sh
+        # Copy username over to GUI script
+        sed -i "s/#username=""/username=$username/g" ~/mochabear97-installer/gui-installer.sh
+        # Make the GUI script executable and copy it to /mnt/etc/profile.d/
         chmod +x ~/mochabear97-installer/gui-installer.sh
         cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile.d/gui-installer.sh
     else
@@ -405,7 +408,7 @@ copy_important () {
         print_w "You did not create a user, this means the second script"
         print_y "will not be copied over and cannot be accessed"
         print_y "after reboot. If you wanted to access it, please"
-        print_y "Reinstall Arch Linux using this script after reboot."
+        print_y "Reinstall Arch Linux using this script."
         echo -e "\n"
         print_i "The second script allows you to install packages and a"
         print_b "desktop environment or window manager of your choosing"
@@ -447,7 +450,7 @@ root_set
 create_user
 copy_important
 
-# Print a message after installing then restarts the system.
+# Print a message after installing then restart the system.
 clear
 print "Installation of Arch Linux is now complete!"
 print "Computer will now restart in 30.0s..."
