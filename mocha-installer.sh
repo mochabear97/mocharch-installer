@@ -17,6 +17,11 @@ print_i () {
     echo -e "\x1b[1;94m[i] $1\e[0m"
 }
 
+# Blue text print info (without the [i]).
+print_b () {
+    echo -e "\x1b[1;94m$1\e[0m"
+}
+
 # Yellow text print warnings.
 print_w () {
     echo -e "\x1b[0;33m[w] $1\e[0m"
@@ -42,8 +47,9 @@ welcome () {
     print "#   Version: 1.0.0           #"
     print "#                            #"
     print "##############################"
-    print "\nNOTE: this install script is intended for"
-    print "Microsoft based systems that include UEFI booting."
+    echo -e "\n"
+    print_i "NOTE: this install script is intended for"
+    print_b "Microsoft based systems that include UEFI booting."
 }
 
 # Ask the user if they want to install this script.
@@ -310,7 +316,7 @@ gpu_driver_check () {
         sleep 3.0s
         sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
         pacman -Syy
-        pacman -S --noconfim nvidia lib32-nvidia-utils nvidia-settings
+        pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
@@ -321,7 +327,7 @@ gpu_driver_check () {
         sleep 3.0s
         sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
         pacman -Syy
-        pacman -S --noconfim nvidia lib32-nvidia-utils nvidia-settings
+        pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
@@ -332,7 +338,7 @@ gpu_driver_check () {
         sleep 3.0s
         sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
         pacman -Syy
-        pacman -S --noconfim nvidia lib32-nvidia-utils nvidia-settings
+        pacman -S --noconfirm nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
@@ -395,8 +401,8 @@ paru_install () {
                    sleep 2.0s
                    pacman -S --needed --noconfim cargo
                    arch-chroot /mnt git clone https://aur.archlinux.org/paru.git
-                   arch-chroot /mnt cd paru
-                   arch-chroot /mnt sudo -u "$username" makepkg -si
+                   arch-chroot /mnt cd paru && sudo -u "$username" makepkg -si
+                   sleep 3.0s
                    ;;
             "" ) clear
                    print "Installing paru now..."
@@ -417,7 +423,7 @@ paru_install () {
 copy_important () {
     if [ -n "$username" ]
         then
-        echo "username=$username" > ~/mochabear97-installer/gui-installer.sh
+        export $username
         # Make the GUI install script executable and copy it to /mnt/etc/profile
         chmod +x ~/mochabear97-installer/gui-installer.sh
         cp ~/mochabear97-installer/gui-installer.sh /mnt/etc/profile/

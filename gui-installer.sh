@@ -17,11 +17,6 @@ print_i () {
     echo -e "\x1b[1;94m[i] $1\e[0m"
 }
 
-# Blue text print info (without the [i]).
-print_b () {
-    echo -e "\x1b[1;94m$1\e[0m"
-}
-
 # Yellow text print warnings.
 print_w () {
     echo -e "\x1b[0;33m[w] $1\e[0m"
@@ -54,6 +49,7 @@ welcome () {
     print "#   Version: 1.0.0           #"
     print "#                            #"
     print "##############################"
+    print "$username"
 }
 
 # Ask the user if they want to install this script.
@@ -1540,10 +1536,10 @@ install_wm () {
         sleep 3.0s
         clear
         git clone https://git.suckless.org/dwm/
-        cd dwm
+        cd dwm || return
         make
         make install
-        cd
+        cd || return
         pacman -S --noconfirm archlinux-appstream-data arandr audacity blueman bottom bzip2 \
             cups cups-pdf dmenu dpkg dunst feh galculator gnome-disk-utility \
             gpick gvfs lxappearance-gtk3 lxsession maim meld mpv networkmanager \
