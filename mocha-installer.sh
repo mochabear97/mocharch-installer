@@ -277,7 +277,7 @@ system_setup () {
 
     print "\nConfiguring system hardware clock..."
     arch-chroot /mnt hwclock --systohc
-    sleep 1.0ss
+    sleep 1.0s
 
     print "\nGenerating locales..."
     arch-chroot /mnt locale-gen &>/dev/null
@@ -297,7 +297,7 @@ system_setup () {
     sleep 1.0s
 }
 
-# Install GPU drivers.
+# Install GPU drivers if detected.
 gpu_driver_install () {
     clear
     print "Checking for graphics card..."
@@ -308,7 +308,9 @@ gpu_driver_install () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        pacman -S nvidia lib32-nvidia-utils nvidia-settings
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        pacman -Syy
+        pacman -S --noconfim nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
@@ -317,7 +319,9 @@ gpu_driver_install () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        pacman -S nvidia-lts lib32-nvidia-utils nvidia-settings
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        pacman -Syy
+        pacman -S --noconfim nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
@@ -326,16 +330,22 @@ gpu_driver_install () {
         clear
         print "Nvidia graphics detected. Installing drivers now..."
         sleep 3.0s
-        pacman -S nvidia-dkms lib32-nvidia-utils nvidia-settings
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        pacman -Syy
+        pacman -S --noconfim nvidia lib32-nvidia-utils nvidia-settings
         sleep 2.0s
     fi
 
     if [ "$AMD_CHECK" == "Advanced Micro Devices" ]
         then
         clear
+        then
+        clear
         print "AMD graphics detected. Installing drivers now..."
         sleep 3.0s
-        pacman -S mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon mesa-vdpau lib32-mesa-vdpau
+        sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+        pacman -Syy
+        pacman -S --noconfirm mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon mesa-vdpau lib32-mesa-vdpau
         sleep 2.0s
     fi
 }
