@@ -528,7 +528,7 @@ audio_1 () {
     print "\n1) cmus"
     print "2) Lollypop"
     print "3) Rhythmbox"
-    print "4) Spotify (AUR)"
+    print "4) Spotify (GIT)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
     case $choice in
@@ -556,8 +556,12 @@ audio_1 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
-            curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -
-            sudo -u "$username" paru -S spotify
+            curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | gpg --import -
+            sudo -u "$username" git clone https://aur.archlinux.org/spotify.git /home/"$username"/spotify
+            cd /home/"$username"/spotify || return
+            sudo -u "$username" makepkg -i
+            rm -rf /home/"$username"/spotify
+            cd || return
             sleep 2.0s
             audio_1
             ;;
@@ -768,7 +772,7 @@ audio_2 () {
     print "\n1) Audacious"
     print "2) cmus"
     print "3) Elisa (Also installs vlc)"
-    print "4) Spotify (AUR)"
+    print "4) Spotify (GIT)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
     case $choice in
@@ -796,8 +800,12 @@ audio_2 () {
             ;;
         4 ) clear
             print_i "Installing Spotify..."
-            curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -
-            sudo -u "$username" paru -S spotify
+            curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | gpg --import -
+            sudo -u "$username" git clone https://aur.archlinux.org/spotify.git /home/"$username"/spotify
+            cd /home/"$username"/spotify || return
+            sudo -u "$username" makepkg -i
+            rm -rf /home/"$username"/spotify
+            cd || return
             sleep 2.0s
             audio_2
             ;;
@@ -1015,7 +1023,8 @@ audio_3 () {
     print "\n1) cmus"
     print "2) Lollypop"
     print "3) Rhythmbox"
-    print "4) Spotify (AUR)"
+    print "4) Ncspot (AUR)"
+    print "5) Spotify (GIT)"
     print "0) [NONE] (Main Menu)"
     read -r -p "Please select one (0-4): " choice
     case $choice in
@@ -1042,9 +1051,19 @@ audio_3 () {
             audio_3
             ;;
         4 ) clear
+            print_i "Installing Ncspot..."
+            sudo -u "$username" paru -S ncspot
+            sleep 2.0s
+            audio_3
+            ;;
+        5 ) clear
             print_i "Installing Spotify..."
-            curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -
-            sudo -u "$username" paru -S spotify
+            curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | gpg --import -
+            sudo -u "$username" git clone https://aur.archlinux.org/spotify.git /home/"$username"/spotify
+            cd /home/"$username"/spotify || return
+            sudo -u "$username" makepkg -i
+            rm -rf /home/"$username"/spotify
+            cd || return
             sleep 2.0s
             audio_3
             ;;
@@ -1579,8 +1598,8 @@ install_wm () {
         sleep 5.0s
         sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
         sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
-        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
-        sudo -u "$username" sed -i 's/^exec.*/exec awesome/' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec awesome/' /home/"$username"/.xinitrc
         sudo -u "$username" mkdir -p /home/"$username"/.config/awesome/
         sudo -u "$username" cp /etc/xdg/awesome/rc.lua /home/"$username"/.config/awesome/
         clear
@@ -1639,8 +1658,8 @@ install_wm () {
         sudo -u "$username" sed -i "s/urxvt/$term_choice/" /home/"$username"/.config/sxhkd/sxhkdrc
         sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
         sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
-        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
-        sudo -u "$username" sed -i 's/^exec.*/exec bspwm/' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec bspwm/' /home/"$username"/.xinitrc
         clear
         print_i "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
@@ -1682,8 +1701,8 @@ install_wm () {
         sleep 5.0s
         sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
         sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
-        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
-        sudo -u "$username" sed -i 's/^exec.*/exec dwm/' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec dwm/' /home/"$username"/.xinitrc
         clear
         print "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
@@ -1720,8 +1739,8 @@ install_wm () {
         sleep 5.0s
         sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
         sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
-        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
-        sudo -u "$username" sed -i 's/^exec.*/exec i3/' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec i3/' /home/"$username"/.xinitrc
         clear
         print_i "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
@@ -1807,8 +1826,8 @@ install_wm () {
         | tee /home/"$username"/.xmonad/xmonad.hs
         sudo -u "$username" cp /etc/X11/xinit/xinitrc /home/"$username"/.xinitrc
         sudo -u "$username" sed -i 's/^twm.*//g' /home/"$username"/.xinitrc
-        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/xinitrc
-        sudo -u "$username" sed -i 's/^exec.*/exec xmonad/' /home/"$username"/xinitrc
+        sudo -u "$username" sed -i 's/^xterm.*//g' /home/"$username"/.xinitrc
+        sudo -u "$username" sed -i 's/^exec.*/exec xmonad/' /home/"$username"/.xinitrc
         clear
         print "Some Systemd services will now be enabled..."
         systemctl enable bluetooth.service
