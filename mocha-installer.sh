@@ -239,12 +239,8 @@ create_partitions () {
         mklabel gpt \
         mkpart ESP fat32 1MiB 251MiB \
         set 1 esp on \
-        name 1 efi \
         mkpart primary linux-swap 251Mib "$swap_size".26GiB \
-        name 2 swap \
         mkpart primary ext4 "$swap_size".26GiB 100% \
-        name 3 root \
-    parted -l
     sleep 10.0s
 }
 
