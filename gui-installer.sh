@@ -1,12 +1,12 @@
 #! /bin/bash
 
+# A simple GUI install script.
+
 #username=""
 
 #################
 #   Functions   #
 #################
-
-# paru install
 
 # Green text print.
 print () {
@@ -1016,7 +1016,7 @@ office_2 () {
 #   Menu 3 Items   #
 ####################
 
-# Audio packages menu.
+# Audio software packages menu.
 audio_3 () {
     clear
     print "***Audio Software***"
@@ -1073,7 +1073,7 @@ audio_3 () {
     esac
 }
 
-# Browser packages menu.
+# Web Browsers packages menu.
 browser_3 () {
     clear
     print "***Web Browsers***"
@@ -1118,7 +1118,7 @@ browser_3 () {
     esac
 }
 
-# Email packages menu.
+# Email clients package menu.
 email_3 () {
     clear
     print "***Email Clients***"
@@ -1170,6 +1170,7 @@ email_3 () {
     esac
 }
 
+# File managers package menu.
 file_manager () {
     clear
     print "***File Managers***"
@@ -1276,7 +1277,7 @@ graphics_3 () {
     esac
 }
 
-# Office suite packages menu.
+# Office suites package menu.
 office_3 () {
     clear
     print "***Office Suites***"
@@ -1307,6 +1308,7 @@ office_3 () {
     esac
 }
 
+# Shell environment package menu.
 shell_env () {
     clear
     print "***Shell Environments***"
@@ -1392,6 +1394,7 @@ terminal_emulator () {
     esac
 }
 
+# Text editor package menu.
 text_editor () {
     clear
     print "***Text Editors***"
@@ -1617,7 +1620,7 @@ install_wm () {
         clear
         print_i "$WM Window Manager installation complete!"
         print_b "Type startsx and hit [ENTER] when logging in after reboot."
-        sleep 3.0s
+        sleep 8.0s
         the_end
     fi
 
@@ -1677,7 +1680,7 @@ install_wm () {
         clear
         print_i "$WM installation complete!"
         print_b "Type startsx and hit [ENTER] when logging in after reboot."
-        sleep 3.0s
+        sleep 8.0s
         the_end
     fi
 
@@ -1691,7 +1694,7 @@ install_wm () {
         sudo -u "$username" git clone https://git.suckless.org/dwm/ /home/"$username"/dwm/
         cd /home/"$username"/dwm/ || return
         sudo -u "$username" make
-        sudo -e "$username" make install
+        sudo -u "$username" make install
         cd || return
         pacman -S --noconfirm archlinux-appstream-data arandr audacity blueman bottom bzip2 \
             cups cups-pdf dmenu dpkg dunst feh galculator gnome-disk-utility \
@@ -1722,7 +1725,7 @@ install_wm () {
         clear
         print_i "$WM installation complete!"
         print_b "Type startsx and hit [ENTER] when logging in after reboot."
-        sleep 3.0s
+        sleep 8.0s
         the_end
     fi
 
@@ -1762,7 +1765,7 @@ install_wm () {
         clear
         print_i "$WM Window Manager installation complete!"
         print_b "Type startsx and hit [ENTER] when logging in after reboot."
-        sleep 3.0s
+        sleep 8.0s
         the_end
     fi
 
@@ -1793,7 +1796,7 @@ install_wm () {
         clear
         print_i "$WM Window Manager installation complete!"
         print_b "Type sway and hit [ENTER] to run sway after reboot."
-        sleep 5.0s
+        sleep 8.0s
         the_end
     fi
 
@@ -1852,7 +1855,7 @@ install_wm () {
         clear
         print_i "$WM Window Manager installation complete!"
         print_b "Type startsx and hit [ENTER] when logging in after reboot."
-        sleep 3.0s
+        sleep 8.0s
         the_end
     fi
 }

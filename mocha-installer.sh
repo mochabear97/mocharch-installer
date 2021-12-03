@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# A simple Arch Linux install script
+# A simple Arch Linux install script.
 
 #################
 #   Functions   #
@@ -118,7 +118,6 @@ disk_confirm () {
 # Ask about memory size and set swap varriable accoringly. [IN PROGRESS]
 # swap_selector () {}
 
-
 # Creating a new partition scheme.
 create_partitions () {
     clear
@@ -165,9 +164,6 @@ microcode_detector () {
         microcode="intel-ucode"
     fi
 }
-
-# Laptop check (Install acpi & acpid)
-#check_laptop () {}
 
 # Selecting a kernel to install. 
 kernel_selector () {
@@ -316,6 +312,31 @@ system_setup () {
     sleep 1.0s
 }
 
+# Laptop check (Install acpi & acpid)
+check_laptop () {
+    clear
+    read -r -p "Are you installing Arch Linux onto a laptop? (y/n): " choice
+    case $choice in
+        "" ) clear
+             print "Installing necessary files for laptops..."
+             sleep 2.0s
+             arch-chroot /mnt pacman -S --noconfirm acpi acpid
+             arch-chroot /mnt systemctl enable acpid.service
+             ;;
+        [Yy] ) clear
+               print "Installing necessary files for laptops..."
+               sleep 2.0s
+               arch-chroot /mnt pacman -S --noconfirm acpi acpid
+               arch-chroot /mnt systemctl enable acpid.service
+               ;;
+        [Nn] ) ;;
+        * ) clear
+            print "Not a valid selection. Please try again."
+            sleep 2.0s
+            check_laptop
+    esac
+}
+
 # Install GPU drivers if detected.
 gpu_driver_check () {
     clear
@@ -404,6 +425,10 @@ create_user () {
 copy_important () {
     if [ -n "$username" ]
         then
+        clear
+        print_i "A useful GUI installation script will be copied" 
+        print_b "over to the new root and launched after install..."
+        sleep 5.0s
         # Make the GUI install script writable
         chmod +w ~/mocharch-installer/gui-installer.sh
         # Copy username over to GUI script
@@ -453,6 +478,7 @@ gen_stab
 locale_selector
 keyboard_selector
 system_setup
+check_laptop
 gpu_driver_check
 root_set
 create_user
