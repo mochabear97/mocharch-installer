@@ -115,8 +115,120 @@ disk_confirm () {
     esac
 }
 
+# Hibernation ask
+hibernation_selector () {
+    clear
+    print_i "Hibernation is when you put a computer to sleep and store"
+    print_b "temporary data onto the hard disk instead of memory."
+    read -r -p "Will you use hibernation at all with your new system? (y/n)" choice
+    case $choice in
+        "" ) hibernation=yes
+            ;;
+        [Yy] ) hibernation=yes
+              ;;
+        [Nn] ) hibernation=no
+              ;;
+        * )
+    esac
+}
+
 # Ask about memory size and set swap varriable accoringly. [IN PROGRESS]
-# swap_selector () {}
+mem_selector () {
+    clear
+    print "Please enter how much RAM (memory) your system contains."
+    print_i "Available Sizes: 8, 12, 16, 24, 32, 64 & 128"
+    read -r -p "A size of 8GB or greater is required. (8-128): " choice
+    case $choice in
+        8 ) mem=8
+           ;;
+        12 ) mem=12
+            ;;
+        16 ) mem=16
+            ;;
+        24 ) mem=24
+            ;;
+        32 ) mem=32
+            ;;
+        64 ) mem=64
+            ;;
+        128 ) mem=128
+             ;;
+        * ) print_w "Please enter a valid size."
+            sleep 5.0s
+            swap_selector
+           ;;
+    esac
+
+}
+
+swap_selector () {
+    # With hibernation.
+    if [ $mem == 8 ] && [ $hibernation == yes ]
+        then
+        swap_size=11
+    fi
+
+    if [ $mem == 12 ] && [ $hibernation == yes ]
+        then
+        swap_size=15
+    fi
+
+    if [ $mem == 16 ] && [ $hibernation == yes ]
+        then
+        swap_size=20
+    fi
+
+    if [ $mem == 24 ] && [ $hibernation == yes ]
+        then
+        swap_size=29
+    fi
+
+    if [ $mem == 32 ] && [ $hibernation == yes ]
+        then
+        swap_size=38
+    fi
+
+    if [ $mem == 64 ] && [ $hibernation == yes ]
+        then
+        swap_size=72
+    fi
+
+    if [ $mem == 128 ] && [ $hibernation == yes ]
+        then
+        swap_size=139
+    fi
+
+    # Without hibernation.
+    if [ $mem == 8 ] || [ $mem == 12 ] && [ $hibernation == no ]
+        then
+        swap_size=3
+    fi
+
+    if [ $mem == 16 ] && [ $hibernation == no ]
+        then
+        swap_size=4
+    fi
+
+    if [ $mem == 24 ] && [ $hibernation == no ]
+        then
+        swap_size=5
+    fi
+
+    if [ $mem == 32 ] && [ $hibernation == no ]
+        then
+        swap_size=6
+    fi
+
+    if [ $mem == 64 ] && [ $hibernation == no ]
+        then
+        swap_size=8
+    fi
+
+    if [ $mem == 128 ] && [ $hibernation == no ]
+        then
+        swap_size=11
+    fi
+}
 
 # Creating a new partition scheme.
 create_partitions () {
@@ -127,9 +239,9 @@ create_partitions () {
         mkpart ESP fat32 1MiB 251MiB \
         set 1 esp on \
         name 1 efi \
-        mkpart primary linux-swap 251Mib 6.26GiB \
+        mkpart primary linux-swap 251Mib "$swap_size".26GiB \
         name 2 swap \
-        mkpart primary ext4 6.26GiB 100% \
+        mkpart primary ext4 "$swap_size".26GiB 100% \
         name 3 root \
     sleep 5.0s
 }
@@ -466,7 +578,9 @@ continue_check
 intitialization
 disk_selector
 disk_confirm
-#swap_selector
+hibernation_selector
+mem_selector
+swap_selector
 create_partitions
 format_partitions
 microcode_detector
