@@ -244,7 +244,7 @@ create_partitions () {
         name 2 swap \
         mkpart primary ext4 "$swap_size".26GiB 100% \
         name 3 root \
-    sfdisk -l "$DISK"
+    parted -l
     sleep 10.0s
 }
 
