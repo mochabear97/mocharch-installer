@@ -6,7 +6,6 @@
 #   Functions   #
 #################
 
-
 # Green text print.
 print () {
     echo -e "\x1b[1;32m$1\e[0m"
@@ -49,7 +48,7 @@ welcome () {
     print "#   Mocha's Arch Installer   #"
     print "#                            #"
     print "#   Author: Mochabear97      #"
-    print "#   Version: 1.0.0           #"
+    print "#   Version: 1.1.0           #"
     print "#                            #"
     print "##############################"
     echo -e "\n"
@@ -158,9 +157,9 @@ mem_selector () {
             swap_selector
            ;;
     esac
-
 }
 
+# Select swap size based on whether hibernation was selected and RAM size.
 swap_selector () {
     # With hibernation.
     if [ $mem == 8 ] && [ $hibernation == yes ]
@@ -234,7 +233,6 @@ swap_selector () {
 create_partitions () {
     clear
     print "Creating the partitions on $DISK..."
-
     parted -s "$DISK" \
         mklabel gpt \
         mkpart ESP fat32 1MiB 251MiB \
@@ -244,19 +242,36 @@ create_partitions () {
     sleep 10.0s
 }
 
-#format disk partitions
+# Format disk partitions
 format_partitions () {
-    clear
-    print "Formatting partitions now..."
+    
+    if [[ "$DISK" == *"nvme"* ]]
+        then
+        clear
+        print "Formatting partitions now..."
 
-    mkfs.ext4 -F "$DISK"p3
-    mkswap "$DISK"p2
-    mkfs.fat -F 32 "$DISK"p1
-    mount "$DISK"p3 /mnt
-    mkdir /mnt/efi
-    mount "$DISK"p1 /mnt/efi
-    swapon "$DISK"p2
+        mkfs.ext4 -F "$DISK"p3
+        mkswap "$DISK"p2
+        mkfs.fat -F 32 "$DISK"p1
+        mount "$DISK"p3 /mnt
+        mkdir /mnt/efi
+        mount "$DISK"p1 /mnt/efi
+        swapon "$DISK"p2
+    fi
 
+    if [[ "$DISK" == *"sd"* ]]
+        then
+        clear
+        print "Formatting partitions now..."
+
+        mkfs.ext4 -F "$DISK"3
+        mkswap "$DISK"2
+        mkfs.fat -F 32 "$DISK"1
+        mount "$DISK"3 /mnt
+        mkdir /mnt/efi
+        mount "$DISK"1 /mnt/efi
+        swapon "$DISK"2
+    fi
     sleep 5.0s
 }
 
@@ -279,7 +294,7 @@ microcode_detector () {
 kernel_selector () {
     clear
     print "***Kernels***"
-    print "\n1) Stable: Vanilla Linux kernel with a few specific Arch Linux patches applied"
+    print "\n1) Vanilla: Stable Linux kernel with a few specific Arch Linux patches applied"
     print "2) Hardened: A security-focused Linux kernel"
     print "3) LTS: Long-term support (LTS) Linux kernel"
     print "4) Zen: A Linux kernel optimized for desktop usage"
@@ -326,9 +341,11 @@ network_selector () {
             ;; 
         3 ) print "Installing NetworkManager."
             pacstrap /mnt networkmanager
+            pacstrap /mnt dhcpcd
             sleep 2.0s
             print "Enabling NetworkManager."
             systemctl enable NetworkManager --root=/mnt &>/dev/null
+            systemctl enable dhcpcd --root=/mnt &>/dev/null
             sleep 2.0s
             ;;
         4 ) ;;
@@ -347,6 +364,66 @@ basic_install () {
 
     pacstrap /mnt base $microcode $kernel linux-firmware git grub efibootmgr \
     base-devel man-db man-pages os-prober sudo texinfo
+}
+
+# Virtualization check.
+virtual_check () {
+    hypervisor=$(systemd-detect-virt)
+    case $hypervisor in
+        kvm )   print "KVM has been detected."
+                print "Installing guest tools."
+                pacstrap /mnt qemu-guest-agent
+                print "Enabling specific services for the guest tools."
+                systemctl enable qemu-guest-agent --root=/mnt &>/dev/null
+                ;;
+        vmware  )   print "VMWare Workstation/ESXi has been detected."
+                    print "Installing guest tools."
+                    pacstrap /mnt open-vm-tools
+                    print "Enabling specific services for the guest tools."
+                    systemctl enable vmtoolsd --root=/mnt &>/dev/null
+                    systemctl enable vmware-vmblock-fuse --root=/mnt &>/dev/null
+                    ;;
+        oracle )    print "VirtualBox has been detected."
+                    print "Installing guest tools."
+                    pacstrap /mnt virtualbox-guest-utils
+                    print "Enabling specific services for the guest tools."
+                    systemctl enable vboxservice --root=/mnt &>/dev/null
+                    ;;
+        microsoft ) print "Hyper-V has been detected."
+                    print "Installing guest tools."
+                    pacstrap /mnt hyperv
+                    print "Enabling specific services for the guest tools."
+                    systemctl enable hv_fcopy_daemon --root=/mnt &>/dev/null
+                    systemctl enable hv_kvp_daemon --root=/mnt &>/dev/null
+                    systemctl enable hv_vss_daemon --root=/mnt &>/dev/null
+                    ;;
+        * ) ;;
+    esac
+}
+
+# Laptop check (Install acpi & acpid)
+laptop_check () {
+    clear
+    read -r -p "Are you installing Arch Linux onto a laptop? (y/n): " choice
+    case $choice in
+        "" ) clear
+             print "Installing necessary files for laptops..."
+             sleep 2.0s
+             arch-chroot /mnt pacman -S --noconfirm acpi acpid
+             arch-chroot /mnt systemctl enable acpid.service
+             ;;
+        [Yy] ) clear
+               print "Installing necessary files for laptops..."
+               sleep 2.0s
+               arch-chroot /mnt pacman -S --noconfirm acpi acpid
+               arch-chroot /mnt systemctl enable acpid.service
+               ;;
+        [Nn] ) ;;
+        * ) clear
+            print "Not a valid selection. Please try again."
+            sleep 2.0s
+            laptop_check
+    esac
 }
 
 # Set a hostname for the new system.
@@ -422,31 +499,6 @@ system_setup () {
     sleep 1.0s
 }
 
-# Laptop check (Install acpi & acpid)
-check_laptop () {
-    clear
-    read -r -p "Are you installing Arch Linux onto a laptop? (y/n): " choice
-    case $choice in
-        "" ) clear
-             print "Installing necessary files for laptops..."
-             sleep 2.0s
-             arch-chroot /mnt pacman -S --noconfirm acpi acpid
-             arch-chroot /mnt systemctl enable acpid.service
-             ;;
-        [Yy] ) clear
-               print "Installing necessary files for laptops..."
-               sleep 2.0s
-               arch-chroot /mnt pacman -S --noconfirm acpi acpid
-               arch-chroot /mnt systemctl enable acpid.service
-               ;;
-        [Nn] ) ;;
-        * ) clear
-            print "Not a valid selection. Please try again."
-            sleep 2.0s
-            check_laptop
-    esac
-}
-
 # Install GPU drivers if detected.
 gpu_driver_check () {
     clear
@@ -504,7 +556,7 @@ root_set() {
     print "Please create a password for the root user."
     until arch-chroot /mnt passwd root
     do
-        print_w "Please try again"
+        print_w "You must enter a valid matching root password to continue."
     done
     sleep 3.0s
 }
@@ -538,14 +590,10 @@ copy_important () {
         clear
         print_i "A useful GUI installation script will be copied" 
         print_b "over to the new root and launched after install..."
-        sleep 5.0s
-        # Make the GUI install script writable
-        chmod +w ~/mocharch-installer/gui-installer.sh
-        # Copy username over to GUI script
-        sed -i "s/#username=""/username=$username/g" ~/mocharch-installer/gui-installer.sh
+        sleep 8.0s
         # Make the GUI script executable and copy it to /mnt/etc/profile.d/
-        chmod +x ~/mocharch-installer/gui-installer.sh
-        cp ~/mocharch-installer/gui-installer.sh /mnt/etc/profile.d/gui-installer.sh
+        chmod +x ~/cmns-assignment/exiles-desktop-installer.sh
+        cp ~/cmns-assignment/exiles-desktop-installer.sh /mnt/etc/profile.d/exiles-desktop-installer.sh
     else
         clear
         print_w "You did not create a user, this means the second script"
@@ -585,12 +633,13 @@ microcode_detector
 kernel_selector
 network_selector
 basic_install
+virtual_check
+laptop_check
 hostname_creator
 gen_stab
 locale_selector
 keyboard_selector
 system_setup
-check_laptop
 gpu_driver_check
 root_set
 create_user
@@ -599,8 +648,8 @@ copy_important
 # Print a message after installing then restart the system.
 clear
 print "Installation of Arch Linux is now complete!"
-print "Computer will now restart in 30.0s..."
-sleep 30.0s
+print "Computer will now restart in 10.0s..."
+sleep 10.0s
 
 print "Exiting"
 reboot
