@@ -591,9 +591,11 @@ copy_important () {
         print_i "A useful GUI installation script will be copied" 
         print_b "over to the new root and launched after install..."
         sleep 8.0s
-        # Make the GUI script executable and copy it to /mnt/etc/profile.d/
-        chmod +x ~/cmns-assignment/exiles-desktop-installer.sh
-        cp ~/cmns-assignment/exiles-desktop-installer.sh /mnt/etc/profile.d/exiles-desktop-installer.sh
+        # Copy username variable to gui-installer.sh.
+        sed -i "s/#username.*/username=$username/" ~/mocharch-installer/gui-installer.sh
+        # Make the GUI script executable and copy it to /mnt/etc/profile.d/.
+        chmod +x ~/mocharch-installer/gui-installer.sh
+        cp ~/mocharch-installer/gui-installer.sh /mnt/etc/profile.d/gui-installer.sh
     else
         clear
         print_w "You did not create a user, this means the second script"
